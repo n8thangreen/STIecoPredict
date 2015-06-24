@@ -1,0 +1,139 @@
+# ##
+# ## STI risk factor regression/classifier
+# ## of NATSAL data
+# ## model_fitting.R
+# ##
+# ## N Green
+# ## April 2014
+#
+#
+# library(class, quietly=TRUE)
+# library(pbapply, quietly=TRUE)
+# library(stargazer, quietly=TRUE)
+#
+#
+# ## define input/output variables
+# ## -----------------------------
+# ## comment-out unused variables for now
+#
+# # riskfac <- c("increasingdrinker", "smokenow", "income", "ethnic", "dage", "rsex")   #submodel
+# # riskfac <- c("increasingdrinker", "smokenow", "nonocon", "income", "ethnic", "sex4wks", "het1yr", "dage", "rsex")   #full model
+# # riskfac <- c("dage", "rsex")
+# # riskfac <- c("increasingdrinker", "smokenow", "ethnic", "dage", "rsex")
+# # riskfac <- c("increasingdrinker", "smokenow", "income", "ethnic", "dage", "rsex", "nonocon")
+#
+#
+#
+#
+# # data.covshift <- covariateShift(data, resla=res[[la]], riskfac, Natsal.riskfac.table)
+# data.covshift <- pblapply(res, function(x) covariateShift(data[1:10000,], resla=x, riskfac, ssize=10000))
+# names(data.covshift) <- names(res)
+# # save(data.covshift, file="./data/output/data_covshift/data_covshift_TEMP.RData")
+#
+# # data.covshift.glm <- pblapply(res[c(3,4)], function(x) covariateShift.glm(data[1:10000,], resla=x, riskfac, ssize=10000))
+#
+#
+#
+# ## check results
+# # ggplot(data.covshift[[1]], aes(x=dage, fill=rsex)) + geom_histogram(position="identity", alpha=0.5, binwidth=0.5)
+# # ggplot(data.covshift.glm[[1]], aes(x=dage, fill=rsex)) + geom_histogram(position="identity", alpha=0.5, binwidth=0.5)
+# # ggplot(ldply(res[[3]], data.frame), aes(x=dage, fill=rsex)) + geom_histogram(position="identity", alpha=0.5, binwidth=0.5)
+#
+#
+#
+# # model fitting -----------------------------------------------------------
+#
+#
+# ############################################################################
+# ## logistic ################################################################
+# ############################################################################
+#
+# fit.model <- c(pblapply(data.covshift, function(x) fitModel(x, x, riskfac, depvar="cttestly")), list(res))
+# names(fit.model) <- c(names(res), "res")
+# # save(fit.model, file="./data/output/fitmodel/fitmodel_TEMP.RData")
+#
+# # fit.model <- fitModel(data.train, data.test, riskfac, "whnchlamYr")
+# # fit.model <- fitModel(data.train, data.test, riskfac, "cttestly")
+#
+# ##TODO##
+# ##doesnt work!
+# summary(fit.model[[2]]$logisticfit)
+#
+# # summary(fit.model$logisticfit)$coeff
+# # stargazer(fit.model$logisticfit, no.space=TRUE)
+#
+#
+# ## table: multiple fitted models
+# ##load("./R_analyses/Chlamydia_classifier/sim_logistic_regn/workspaces/regressionFit_1634elsewhere.RData")
+# # stargazer(fit.whchlamYr.agesex,
+# #           fit.whchlamYr.submodel,
+# #           fit.whchlamYr.fullmodel,
+# #           fit.cttestly.agesex,
+# #           fit.cttestly.submodel,
+# #           fit.cttestly.fullmodel, single.row=TRUE, style="all2", digits=2, column.sep.width="1pt")#no.space=TRUE)
+#
+# # with(fit.cttestly.fullmodel, null.deviance - deviance)
+# # with(fit.cttestly.fullmodel, df.null - df.residual)
+# # with(fit.cttestly.fullmodel, pchisq(null.deviance - deviance, df.null - df.residual, lower.tail = FALSE))
+# # logLik(fit.cttestly.fullmodel)
+#
+#
+# ## model fit against training data
+# predict.lgstc(fit=fit.model[[25]]$logisticfit,
+#               data=fit.model[[25]]$data.train)
+#
+# ## model fit against test (hold-out) data
+# predict.lgstc(fit=fit.model$logisticfit,
+#               data=fit.model$data.test, ADD=T)
+#
+#
+#
+#
+# ## diagnosis
+# # contrasts(data.train$whnchlamYr)
+# # fit.pred.train <- rep(FALSE, nrow(data.train))
+# # fit.pred.train[fit.probs.train>0.5] <- TRUE
+# # table(fit.pred.train, data.train$whnchlamYr)
+#
+#
+#
+#
+# #######################################################################
+# ## KNN ################################################################
+# #######################################################################
+#
+#
+# predict.knn.train <- predictKNN(fit=fit.model[[30]])
+# plot(predict.knn.train$pred_knn, col="red", add=F)
+#
+#
+#
+# predict.knn.test <- predictKNN(fit=fit.model[[3]], test=TRUE)
+# plot(predict.knn.test$pred_knn, col="blue", add=T)
+#
+#
+# ## coverages
+# ### total positives
+# tot.pos.pred <- ctable["YES","Total"]/ctable["Total","Total"] #pred
+# tot.pos.obs <- ctable["Total","YES"]/ctable["Total","Total"] #obs
+# ### true positives
+# true.pos  <- ctable["YES","YES"]/ctable["Total","Total"]
+# ### false poitives
+# false.pos <- ctable["YES","NO"]/ctable["Total","Total"]
+# ### false negatives
+# false.neg <- ctable["NO","YES"]/ctable["Total","Total"]
+# ### adjustments
+# prop.TP.obs  <- ctable["YES","YES"]/ctable["Total","YES"]
+# prop.TP.pred <- ctable["YES","YES"]/ctable["YES","Total"]
+#
+#
+#
+# ## no covariate shift case
+# save(test.datmat=predict.knn.train$test.datmat, train.datmat=predict.knn.train$train.datmat,
+#      train.out=fit.model$train.out, test.out=fit.model$test.out,
+#      fit.model=fit.model$logisticfit, formula=fit.model$formula, k,
+#      tot.pos.pred, tot.pos.obs, true.pos, false.pos, false.neg, prop.TP.obs, prop.TP.pred,
+#      file="./R_analyses/Chlamydia_classifier/sim_logistic_regn/workspaces/regn/riskfactor_regn_submodel_1634_LondonRF_output.RData")
+#
+#
+#
