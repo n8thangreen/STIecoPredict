@@ -1,0 +1,11 @@
+---
+output: md_document
+---
+
+```{r set-options, echo=FALSE, cache=FALSE}
+options(width = 1000)
+```
+
+# STIecoPredict
+
+Preparatory functions for multi-level regression and post-stratification (MRP) at the Local Authority level, applied in an STI context.
