@@ -7,10 +7,13 @@
 #' ##TODO##
 #' I've commented-out the logisitic knn predictions and used the MRP one instead
 #'
-#' @param pred Prediction array
+#' @param pred Prediction array. Ensure that the first column is the LA names.
+#' @param adj Double counting adjustment <=1. From Sarah Woodall's paper.
+#' @param survData.filename User supplied surveillance data
 #' @param ...
+#' @return CTADGUM_pred
 
-joinAllOutcomeData <- function(pred, ...){
+joinAllOutcomeData <- function(pred, adj=0.87, survData.filename=NA, ...){
 
     require(scales)
     require(ggplot2)
@@ -18,46 +21,64 @@ joinAllOutcomeData <- function(pred, ...){
     require(plyr)
     require(STIecoPredict)
 
+    stopifnot(is.character(pred[,1]))
+    stopifnot(ncol(pred)>1)
+    stopifnot(is.numeric(adj))
+
     #system.file(package="STIecoPredict")
 
-    ########################################################################
-    ## load data ###########################################################
-    ########################################################################
+    ## surveillance data @ LA level
+    data("CTADGUM_dat2012") #16-34 yr olds    #notice this has been adjusted from the standard 15 to 16 year olds in line with Natsal
+    data("CTADGUM_dat2011") #16-24 yr olds
+    data("CTADGUM_age1524_2012")
+    data("CTADGUM_age1524_2013")
+    data("CTADGUM_age1524_2014")
+    data(NCSP_NNNG_GUM_age1524_2011)
 
-    popLA.dat <- read.csv(".\\raw-data\\ONS_LA_population_2011.csv", check.names=FALSE)
-
-    ## surveillance data
-    ### 2012 16-34 yr olds
-    CTADGUM.dat2012 <- read.csv(".\\raw-data\\CTADGUM_data2012_age1634.csv", check.names=FALSE)
-    ### 2011 16-24 yr olds
-    # CTADGUM.dat <- read.csv(".\\data\\surveillance\\1624ageSurveillanceData2011.csv", check.names=FALSE)
-    CTADGUM.dat2011 <- read.csv(".\\raw-data\\Surveillance_data2011_age1524.csv", check.names=FALSE)    #newer version from Ellie
-
-    ## index of multiple deprivation
-    IMD.dat2010 <- read.csv(".\\raw-data\\LA_IMD.csv", check.names=FALSE)
-    IMD.dat2010$`LA NAME` <- gsub(" District", "", IMD.dat2010$`LA NAME`)
-
-    houseprice_earnings.dat <- read.csv(".\\raw-data\\houseprice_earnings.csv", check.names=FALSE)  #, colClasses=c("2010"="numeric")
-
-    LAclassification.dat <- read.csv(".\\raw-data\\LA_classification.csv", check.names=FALSE)  #, colClasses=c("2010"="numeric")
-
+    data("ONS_LA_population_2011")
+    data("LA_IMD")
+    data("houseprice_earnings")
+    data("LA_classification")
 
     #########################################################################
     ## preprocess ###########################################################
     #########################################################################
 
+    names(pred) <- sub("LA.Name", "LA Name", names(pred), ignore.case = TRUE)
+
+    names(CTADGUM.dat2012) <- sub("LA.Name", "LA Name", names(CTADGUM.dat2012), ignore.case = TRUE)
+    names(CTADGUM.dat2011) <- sub("LA.Name", "LA Name", names(CTADGUM.dat2011), ignore.case = TRUE)
+    names(CTADGUM_age1524_2012) <- sub("LA.Name", "LA Name", names(CTADGUM_age1524_2012), ignore.case = TRUE)
+    names(CTADGUM_age1524_2013) <- sub("LA.Name", "LA Name", names(CTADGUM_age1524_2013), ignore.case = TRUE)
+    names(NCSP.NNNG.GUM_age1524_2011) <- sub("LA.Name", "LA Name", names(NCSP.NNNG.GUM_age1524_2011), ignore.case = TRUE)
+
+    names(CTADGUM.dat2012) <- sub("Combined.Coverage", "Combined Coverage", names(CTADGUM.dat2012), ignore.case = TRUE)
+    names(CTADGUM.dat2011) <- sub("Combined.Coverage", "Combined Coverage", names(CTADGUM.dat2011), ignore.case = TRUE)
+    names(CTADGUM_age1524_2012) <- sub("Combined.Coverage", "Combined Coverage", names(CTADGUM_age1524_2012), ignore.case = TRUE)
+    names(CTADGUM_age1524_2013) <- sub("Combined.Coverage", "Combined Coverage", names(CTADGUM_age1524_2013), ignore.case = TRUE)
+    names(NCSP.NNNG.GUM_age1524_2011) <- sub("Combined.Coverage", "Combined Coverage", names(NCSP.NNNG.GUM_age1524_2011), ignore.case = TRUE)
+
+    IMD.dat2010$`LA Name` <- gsub(" District", "", IMD.dat2010$`LA Name`, ignore.case = TRUE)
+
     CTADGUM.dat2012$"LA Name" <- toupper(CTADGUM.dat2012$"LA Name")
     CTADGUM.dat2012$"LA Name" <- LAnameClean(CTADGUM.dat2012$"LA Name")
     CTADGUM.dat2011$"LA Name" <- toupper(CTADGUM.dat2011$"LA Name")
     CTADGUM.dat2011$"LA Name" <- LAnameClean(CTADGUM.dat2011$"LA Name")
-    popLA.dat$LA <- toupper(popLA.dat$LA)
-    popLA.dat$LA <- LAnameClean(popLA.dat$LA)
-    houseprice_earnings.dat$"Local authority" <- toupper(houseprice_earnings.dat$"Local authority")
-    houseprice_earnings.dat$"Local authority" <- LAnameClean(houseprice_earnings.dat$"Local authority")
-    IMD.dat2010$`LA NAME` <- toupper(IMD.dat2010$`LA NAME`)
-    IMD.dat2010$`LA NAME` <- LAnameClean(IMD.dat2010$`LA NAME`)
-    LAclassification.dat$Name <- toupper(LAclassification.dat$Name)
-    LAclassification.dat$Name <- LAnameClean(LAclassification.dat$Name)
+    CTADGUM_age1524_2012$"LA Name" <- toupper(CTADGUM_age1524_2012$"LA Name")
+    CTADGUM_age1524_2012$"LA Name" <- LAnameClean(CTADGUM_age1524_2012$"LA Name")
+    CTADGUM_age1524_2013$"LA Name" <- toupper(CTADGUM_age1524_2013$"LA Name")
+    CTADGUM_age1524_2013$"LA Name" <- LAnameClean(CTADGUM_age1524_2013$"LA Name")
+    NCSP.NNNG.GUM_age1524_2011$"LA Name" <- toupper(NCSP.NNNG.GUM_age1524_2011$"LA Name")
+    NCSP.NNNG.GUM_age1524_2011$"LA Name" <- LAnameClean(NCSP.NNNG.GUM_age1524_2011$"LA Name")
+
+    popLA.dat$`LA Name` <- toupper(popLA.dat$`LA Name`)
+    popLA.dat$`LA Name` <- LAnameClean(popLA.dat$`LA Name`)
+    houseprice_earnings.dat$"LA Name" <- toupper(houseprice_earnings.dat$"LA Name")
+    houseprice_earnings.dat$"LA Name" <- LAnameClean(houseprice_earnings.dat$"LA Name")
+    IMD.dat2010$`LA Name` <- toupper(IMD.dat2010$`LA Name`)
+    IMD.dat2010$`LA Name` <- LAnameClean(IMD.dat2010$`LA Name`)
+    LAclassification.dat$`LA Name` <- toupper(LAclassification.dat$`LA Name`)
+    LAclassification.dat$`LA Name` <- LAnameClean(LAclassification.dat$`LA Name`)
 
     ## non-London LAs
     LAnames.nonLondon <- popLA.dat$LA[popLA.dat$Area!="LONDON"]
@@ -80,50 +101,54 @@ joinAllOutcomeData <- function(pred, ...){
     ## joins ##
     ###########
 
+    names(pred)[1] <- "LA Name"
+
     # pred <- merge(pred.log[,c("la","Coverage")],
     #               pred.knn[,c("la","Coverage")], by="la")
 
-    CTADGUM_pred <- merge(CTADGUM.dat2011[,c("LA Name","Combined Coverage")],
-                          CTADGUM.dat2012[,c("LA Name", "Combined Coverage")],
-                          by="LA Name", all=TRUE)
-    names(CTADGUM_pred)[names(CTADGUM_pred)=="Combined Coverage.x"] <- "surv2011.1524"
-    names(CTADGUM_pred)[names(CTADGUM_pred)=="Combined Coverage.y"] <- "surv2012.1634"
+    colnames <- c("LA Name", "Combined Coverage")
 
-    CTADGUM_pred <- merge(CTADGUM_pred, pred, by.x="LA Name", by.y="LAname")
-    names(CTADGUM_pred)[names(CTADGUM_pred)=="Coverage.x"] <- "pred.log"
-    names(CTADGUM_pred)[names(CTADGUM_pred)=="Coverage.y"] <- "pred.knn"
+    data.list <- list(CTADGUM.dat2011[, colnames],
+                      CTADGUM.dat2012[, colnames],
+                      CTADGUM_age1524_2012[, colnames],
+                      CTADGUM_age1524_2013[, colnames],
+                      NCSP.NNNG.GUM_age1524_2011[, colnames])
 
-    adj <- 0.87 # double counting correction, from Sarah Woodall's paper
+    CTADGUM_pred <- Reduce(function(...) merge(..., by="LA Name", all=TRUE), data.list)
 
-    CTADGUM_pred <- within(CTADGUM_pred, {
+    names(CTADGUM_pred)[-1] <- c("surv2011.1624", "surv2012.1634", "surv2012.1524", "surv2013.1524", "surv2011.1524")
 
-        ## DEDUPLICATION for repeat tests
-        `surv2011.1524` <- `surv2011.1524`*adj
-        `surv2012.1634` <- `surv2012.1634`*adj
+    CTADGUM_pred[,-1] <- CTADGUM_pred[,-1]*adj      #DE-DUPLICATION for repeat tests
 
+    # CTADGUM_pred <- within(CTADGUM_pred, {
         ##TODO##
         ##hack to remove outliers. could Winsorize instead...
         # elseif(CTADGUM_pred$surv2012.1634>upperlim, , CTADGUM_pred$surv2012.1634>upperlim)
         # `surv2012.1634`[`LA Name`=="Kettering"] <- NA#0.5221963
         # `surv2012.1634`[`LA Name`=="Dacorum"] <- NA#0.4177031
         # `surv2011.1524`[`LA Name`=="Chesterfield"] <- NA#0.6716591
-    })
+    # })
 
-    ## LA-level statistics for points
+    CTADGUM_pred <- merge(CTADGUM_pred, pred, by.x="LA Name", by.y="LA Name")
+    # names(CTADGUM_pred)[names(CTADGUM_pred)=="Coverage.x"] <- "pred.log"
+    # names(CTADGUM_pred)[names(CTADGUM_pred)=="Coverage.y"] <- "pred.knn"
 
-    ## density
-    CTADGUM_pred <- merge(CTADGUM_pred, popLA.dat[,c("LA","Population","Density")],
-                          by.x="LA Name", by.y="LA", all.x=TRUE)
+    ## merge LA-level statistics for points
 
-    CTADGUM_pred <- merge(CTADGUM_pred, IMD.dat2010[,c("LA NAME","Average Score")], by.x="LA Name", by.y="LA NAME", all.x=TRUE)
+    CTADGUM_pred <- merge(CTADGUM_pred, popLA.dat[,c("LA Name","Population","Density")],
+                          by.x="LA Name", by.y="LA Name", all.x=TRUE)
+
+    CTADGUM_pred <- merge(CTADGUM_pred, IMD.dat2010[,c("LA Name","Average Score")],
+                          by.x="LA Name", by.y="LA Name", all.x=TRUE)
     names(CTADGUM_pred)[names(CTADGUM_pred)=="Average Score"] <- "IMD2010"
 
     houseprice_earnings.dat$"2010" <- as.numeric(as.character(houseprice_earnings.dat$"2010"))
-    CTADGUM_pred <- merge(CTADGUM_pred, houseprice_earnings.dat[,c("Local authority","2010")], by.x="LA Name", by.y="Local authority", all.x=TRUE)
+    CTADGUM_pred <- merge(CTADGUM_pred, houseprice_earnings.dat[,c("LA Name","2010")],
+                          by.x="LA Name", by.y="LA Name", all.x=TRUE)
     names(CTADGUM_pred)[names(CTADGUM_pred)=="2010"] <- "housepriceEarnings2010"
 
-    CTADGUM_pred <- merge(CTADGUM_pred, LAclassification.dat[,c("Name","Classification")], by.x="LA Name", by.y="Name", all.x=TRUE)
-
+    CTADGUM_pred <- merge(CTADGUM_pred, LAclassification.dat[,c("LA Name","Classification","Region")],
+                          by.x="LA Name", by.y="LA Name", all.x=TRUE)
 
     ## ordination plots package
     # http://www.fromthebottomoftheheap.net/2013/12/31/decluttering-ordination-in-vegan-part-4-orditkplot/
@@ -138,9 +163,10 @@ joinAllOutcomeData <- function(pred, ...){
 #' Calculates the residuals, indirect standardised rates,
 #' mean difference, binomial threshold exceedence and quadrant.
 #'
-#' @param CTADGUM_pred
+#' @param CTADGUM_pred Combined model LA level predictions and census/administrative data
 #'
-#' @return
+#' @return CTADGUM_pred
+#' @seealso joinAllOutcomeData
 
 calcStats.CTADGUM_pred <- function(CTADGUM_pred){
 
@@ -186,6 +212,11 @@ calcStats.CTADGUM_pred <- function(CTADGUM_pred){
                                                     ifelse(meandiff_surv2012.1634>0 & meandiff_surv2012.1634_pred<0,"3",
                                                            ifelse(meandiff_surv2012.1634<0 & meandiff_surv2012.1634_pred<0,"4",NA))))
     })
+
+    CTADGUM_pred$name.quadrant_surv2011.1524[CTADGUM_pred$quadrant_surv2011.1524=="1"] <- "aboveSurv_abovePred"
+    CTADGUM_pred$name.quadrant_surv2011.1524[CTADGUM_pred$quadrant_surv2011.1524=="2"] <- "belowSurv_abovePred"
+    CTADGUM_pred$name.quadrant_surv2011.1524[CTADGUM_pred$quadrant_surv2011.1524=="3"] <- "aboveSurv_belowPred"
+    CTADGUM_pred$name.quadrant_surv2011.1524[CTADGUM_pred$quadrant_surv2011.1524=="4"] <- "belowSurv_belowPred"
 
     CTADGUM_pred
 }

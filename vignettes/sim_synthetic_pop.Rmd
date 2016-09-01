@@ -1,0 +1,48 @@
+---
+title: "Simulate local level populations: individually or proportions"
+author: "N Green"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+In order to later-on do the mulit-level regression and poststratification (MRP) we need to have a joint distribution of the covariates for the population we are interested in.
+Unfortunately, most data are available as 1, 2 or maybe 3-way tables but the complete cross-classification is not available.
+What we do here is estimate a joint cross-classification for the risk factors of interest by combining several different data sets together.
+The principle is that they are, in the main, conditionally independent given the age and sex of an individual so we can kind-of use the age and sex distributions at the local level to link together the different data sets.
+This isn't perfect for for all intents and purposed its __probably__ ok.
+
+This is a special case of what Jackson _et al_ does in his hierarchical related regression work (see the `ecoreg` package).
+
+I also scale each LA's risk factor values by the relative overall value when compared to the national average.
+
+I've written 2 separate function but they are based on the same idea and code. The first `locallevel_pop_sim` generates individual samples of a population with the required joint distribution. This can be pretty slow to run.
+
+```{r eval=FALSE}
+sim_indiv <- locallevel_pop_sim(NATSAL.dat, n=4)
+head(sim_indiv[[3]])
+```
+
+
+```{r, eval=FALSE}
+save(sim_indiv, file="./data/sim_indiv.RData")
+```
+
+
+However, in the case of MRP we are only really interested in the joint distribution, in order to do the post-stratification step, so we end up just aggregating the individual level data anyway. Better to just estimate the joint probabilities in the first place and so thats what I do with `locallevel_pop_props`.
+
+```{r eval=FALSE}
+sim_prop <- locallevel_pop_props()
+##TODO## LA~age+sex+smokenow)
+head(sim_prop[[1]], 100)
+```
+
+
+```{r eval=FALSE}
+save(sim_prop, file="./data/sim_prop.RData")
+```
+
+
