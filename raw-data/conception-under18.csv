@@ -1,0 +1,438 @@
+Name,Number of Conceptions,"Conception rate per 1,000 women in age group","Maternity rate per 1,000 women in age group","Abortion rate per 1,000 women in age group",Percentage of conceptions leading to abortion
+ENGLAND AND WALES                   ,34633,35.5,17.8,17.7,49.9
+ENGLAND                             ,32552,35.4,17.6,17.8,50.3
+WALES                               ,2081,37.7,20.9,16.8,44.5
+NORTH EAST                          ,2032,44.3,25.4,18.9,42.7
+County Durham UA          ,384,43.2,25.2,18,41.7
+Chester-le-Street                   ,32,33.9,,,
+Derwentside                         ,74,48.1,28,20.2,41.9
+Durham                              ,50,36,18,18,50
+Easington                           ,93,52,31.9,20.1,38.7
+Sedgefield                          ,71,44.6,29.5,15.1,33.8
+Teesdale                            ,14,32.9,,,
+Wear Valley                         ,50,41.4,23.2,18.2,44
+Darlington UA                       ,66,37.2,18.6,18.6,50
+Hartlepool UA                       ,100,55.5,33.8,21.6,39
+Middlesbrough UA                    ,178,64.5,38.4,26.1,40.4
+Northumberland UA,181,33.8,19.4,14.4,42.5
+Alnwick                             ,12,21.4,,,
+Berwick-upon-Tweed                  ,6,14.7,,,
+Blyth Valley                        ,76,51.4,29.8,21.7,42.1
+Castle Morpeth                      ,11,12.5,,,
+Tynedale                            ,14,14,,,
+Wansbeck                            ,62,59.8,37.6,22.2,37.1
+Redcar and Cleveland UA             ,121,46.2,26.7,19.5,42.1
+Stockton-on-Tees UA                 ,145,39.1,23.4,15.6,40
+Tyne and Wear (Met county)          ,857,45.3,25.3,20,44.1
+Gateshead                           ,166,49.7,31.7,18,36.1
+Newcastle upon Tyne                 ,197,46.8,23.5,23.3,49.7
+North Tyneside                      ,122,36,19.5,16.5,45.9
+South Tyneside                      ,108,39.8,22.9,17,42.6
+Sunderland                          ,264,50.1,27.7,22.4,44.7
+NORTH WEST                          ,5129,40.7,20.6,20.1,49.3
+Blackburn with Darwen UA            ,124,41.4,23.7,17.7,42.7
+Blackpool UA                        ,130,50,27.7,22.3,44.6
+Cheshire East UA       ,209,32.2,15.3,17,52.6
+Congleton                           ,43,26,10.9,15.1,58.1
+Crewe and Nantwich                  ,102,44.6,23.2,21.4,48
+Macclesfield                        ,64,25.2,11,14.2,56.3
+Cheshire West and Chester UA,207,35.6,17.7,17.9,50.2
+Chester                             ,64,32.2,15.6,16.6,51.6
+Ellesmere Port and Neston           ,59,39.9,18.3,21.7,54.2
+Vale Royal                          ,84,35.8,19.2,16.6,46.4
+Halton UA                           ,142,63.3,31.7,31.7,50
+Warrington UA                       ,122,34,13.1,20.9,61.5
+Cumbria                             ,281,31.1,18.1,13.1,42
+Allerdale                           ,59,34.8,17.7,17.1,49.2
+Barrow-in-Furness                   ,56,39.2,24.5,14.7,37.5
+Carlisle                            ,68,38.2,25.3,12.9,33.8
+Copeland                            ,43,35.8,,,
+Eden                                ,16,17.9,,,
+South Lakeland                      ,39,19.2,7.9,11.3,59
+Greater Manchester (Met county)     ,2052,44,22.6,21.4,48.6
+Bolton                              ,198,39.3,23.6,15.7,39.9
+Bury                                ,145,41.1,19.3,21.8,53.1
+Manchester                          ,398,57.2,29.8,27.5,48
+Oldham                              ,183,42.1,20.7,21.4,50.8
+Rochdale                            ,152,37.5,19,18.5,49.3
+Salford                             ,223,57.9,31.7,26.2,45.3
+Stockport                           ,168,33.2,14.4,18.8,56.5
+Tameside                            ,197,48.3,24.5,23.8,49.2
+Trafford                            ,112,28.7,13.6,15.1,52.7
+Wigan                               ,276,47.4,25.1,22.3,47.1
+Lancashire                          ,820,37.5,19.2,18.3,48.8
+Burnley                             ,98,59.2,31.4,27.8,46.9
+Chorley                             ,67,35.2,14.2,21,59.7
+Fylde                               ,37,29.2,20.5,8.7,29.7
+Hyndburn                            ,73,43.2,26,17.2,39.7
+Lancaster                           ,88,33.2,16.6,16.6,50
+Pendle                              ,83,47.2,20.5,26.7,56.6
+Preston                             ,92,41.1,22.8,18.3,44.6
+Ribble Valley                       ,20,16.7,4.2,12.5,75
+Rossendale                          ,63,43.7,26.4,17.3,39.7
+South Ribble                        ,74,37.8,17.4,20.4,54.1
+West Lancashire                     ,64,31.6,14.3,17.3,54.7
+Wyre                                ,61,29.7,16.6,13.2,44.3
+Merseyside (Met county)             ,1042,42.1,20.2,21.9,52
+Knowsley                            ,122,39.1,15.7,23.4,59.8
+Liverpool                           ,309,44.5,19.6,24.9,56
+Sefton                              ,155,29.1,13.7,15.4,52.9
+St Helens                           ,180,51.2,29,22.2,43.3
+Wirral                              ,276,47.3,24,23.3,49.3
+Former county of Cheshire,416,33.8,16.4,17.4,51.4
+YORKSHIRE AND THE HUMBER,3823,40.5,22.2,18.4,45.3
+East Riding of Yorkshire UA         ,175,29.4,15.1,14.3,48.6
+"Kingston upon Hull, City of UA      ",261,55.2,33.8,21.4,38.7
+North East Lincolnshire UA          ,183,60,35.4,24.6,41
+North Lincolnshire UA               ,140,47.4,30.1,17.3,36.4
+York UA                             ,80,26.3,12.5,13.8,52.5
+North Yorkshire                     ,228,20.6,10.6,10,48.7
+Craven                              ,26,25.3,9.7,15.6,61.5
+Hambleton                           ,28,18.5,9.2,9.2,50
+Harrogate                           ,51,16.3,6.7,9.6,58.8
+Richmondshire                       ,16,19.2,,,
+Ryedale                             ,16,15.2,,,
+Scarborough                         ,63,36.3,24.8,11.5,31.7
+Selby                               ,28,15.8,7.9,7.9,50
+South Yorkshire (Met county)        ,1132,48.4,27.4,21,43.5
+Barnsley                            ,236,55.2,35.5,19.6,35.6
+Doncaster                           ,310,57.1,32.1,25.1,43.9
+Rotherham                           ,218,45.4,27.7,17.7,39
+Sheffield                           ,368,41.4,20.4,21,50.8
+West Yorkshire (Met county)         ,1624,40.5,21.2,19.3,47.7
+Bradford                            ,360,35.3,21.1,14.2,40.3
+Calderdale                          ,155,41.6,18.2,23.3,56.1
+Kirklees                            ,314,42.7,21.5,21.2,49.7
+Leeds                               ,555,43.5,21.7,21.9,50.3
+Wakefield                           ,240,39.4,21.7,17.7,45
+EAST MIDLANDS                       ,2762,34.5,19.7,14.8,42.9
+Derby UA                            ,185,43.3,27.6,15.7,36.2
+Leicester UA                        ,232,44.4,,,
+Nottingham UA                       ,245,54.4,31.7,22.6,41.6
+Rutland UA                          ,7,6.2,,,
+Derbyshire                          ,441,31.4,17,14.5,46
+Amber Valley                        ,71,31.8,18.4,13.4,42.3
+Bolsover                            ,59,43.4,23.6,19.9,45.8
+Chesterfield                        ,69,37.3,23.2,14.1,37.7
+Derbyshire Dales                    ,21,16.8,,,
+Erewash                             ,71,33,19.1,13.9,42.3
+High Peak                           ,61,38,17.4,20.6,54.1
+North East Derbyshire               ,46,26.8,10.5,16.3,60.9
+South Derbyshire                    ,43,23.1,,,
+Leicestershire                      ,306,26.5,13.4,13.2,49.7
+Blaby                               ,33,19.7,7.8,12,60.6
+Charnwood                           ,87,29.7,15.7,14,47.1
+Harborough                          ,26,16.1,7.4,8.6,53.8
+Hinckley and Bosworth               ,50,28.1,16.9,11.2,40
+Melton                              ,26,30.3,18.7,11.7,38.5
+North West Leicestershire           ,52,34.4,16.5,17.9,51.9
+Oadby and Wigston                   ,32,27.6,10.4,17.3,62.5
+Lincolnshire                        ,435,34.4,20.2,14.2,41.4
+Boston                              ,40,38.3,21.1,17.2,45
+East Lindsey                        ,90,38.3,24.7,13.6,35.6
+Lincoln                             ,80,52.5,36.7,15.7,30
+North Kesteven                      ,49,25.1,11.3,13.8,55.1
+South Holland                       ,46,30.3,18.4,11.9,39.1
+South Kesteven                      ,80,32.3,17.4,14.9,46.3
+West Lindsey                        ,50,28.3,14.7,13.6,48
+Northamptonshire                    ,450,35.1,20,15,42.9
+Corby                               ,69,62.8,37.3,25.5,40.6
+Daventry                            ,41,26.1,15.3,10.8,41.5
+East Northamptonshire               ,40,20,13,7,35
+Kettering                           ,60,37.6,21.9,15.7,41.7
+Northampton                         ,152,42.9,24.8,18.1,42.1
+South Northamptonshire              ,28,16.8,7.2,9.6,57.1
+Wellingborough                      ,60,44.5,23,21.5,48.3
+Nottinghamshire                     ,461,32.9,18.3,14.7,44.5
+Ashfield                            ,85,41,23.2,17.9,43.5
+Bassetlaw                           ,72,34.4,21,13.4,38.9
+Broxtowe                            ,52,27.6,15.4,12.2,44.2
+Gedling                             ,72,34.8,14,20.8,59.7
+Mansfield                           ,76,39.5,26,13.5,34.2
+Newark and Sherwood                 ,69,34.1,20.7,13.3,39.1
+Rushcliffe                          ,35,18.1,7.3,10.9,60
+WEST MIDLANDS                       ,4081,40.5,20.7,19.7,48.8
+"Herefordshire, County of UA         ",94,29.8,13.9,15.8,53.2
+Shropshire UA         ,131,23.9,11.3,12.6,52.7
+Bridgnorth                          ,31,35.5,16,19.5,54.8
+North Shropshire                    ,18,16,,,
+Oswestry                            ,18,19.6,7.6,12,61.1
+Shrewsbury and Atcham               ,46,24.4,10.6,13.8,56.5
+South Shropshire                    ,18,26.2,,,
+Stoke-on-Trent UA                   ,224,54.6,33.7,21,38.4
+Telford and Wrekin UA               ,155,47.5,26.1,21.5,45.2
+Staffordshire                       ,571,37.3,17.8,19.5,52.2
+Cannock Chase                       ,87,49.7,25.1,24.6,49.4
+East Staffordshire                  ,78,35.9,16.1,19.8,55.1
+Lichfield                           ,58,31,14.4,16.6,53.4
+Newcastle-under-Lyme                ,68,33.3,17.1,16.1,48.5
+South Staffordshire                 ,52,25.7,8.4,17.3,67.3
+Stafford                            ,81,37.1,17,20.2,54.3
+Staffordshire Moorlands             ,53,30.6,16.2,14.4,47.2
+Tamworth                            ,94,61.6,32.8,28.9,46.8
+Warwickshire                        ,333,34.8,16.3,18.5,53.2
+North Warwickshire                  ,54,49.9,12.9,37,74.1
+Nuneaton and Bedworth               ,119,51.6,30.8,20.8,40.3
+Rugby                               ,54,27.2,13.6,13.6,50
+Stratford-on-Avon                   ,51,24.8,12.2,12.7,51
+Warwick                             ,55,25.7,8.9,16.8,65.5
+West Midlands (Met county)          ,2284,45.9,23.7,22.2,48.3
+Birmingham                          ,847,43.3,20.4,22.9,52.9
+Coventry                            ,273,50.2,23,27.2,54.2
+Dudley                              ,228,40.6,20.1,20.5,50.4
+Sandwell                            ,313,55.8,31.6,24.3,43.5
+Solihull                            ,93,22.5,9.9,12.6,55.9
+Walsall                             ,260,51.4,31.5,20,38.8
+Wolverhampton                       ,270,62.3,38.3,24,38.5
+Worcestershire                      ,289,28.3,15,13.3,47.1
+Bromsgrove                          ,37,21.7,7.6,14.1,64.9
+Malvern Hills                       ,35,20.7,10.6,10,48.6
+Redditch                            ,48,33.9,19.1,14.8,43.8
+Worcester                           ,69,41.4,21.6,19.8,47.8
+Wychavon                            ,52,24.9,14.8,10,40.4
+Wyre Forest                         ,48,29.2,17,12.2,41.7
+EAST                                ,3114,29.8,14.2,15.7,52.5
+Bedford UA              ,117,40.8,21.3,19.5,47.9
+Bedford                             ,117,40.8,21.3,19.5,47.9
+Central Bedfordshire UA,166,35.7,14.9,20.9,58.4
+Mid Bedfordshire                    ,59,23.7,8,15.7,66.1
+South Bedfordshire                  ,107,49.7,22.7,26.9,54.2
+Luton UA                            ,122,33.7,19.3,14.4,42.6
+Peterborough UA                     ,161,50.5,29.5,21,41.6
+Southend on Sea UA                  ,109,39,18.6,20.4,52.3
+Thurrock UA                         ,97,33.1,14,19.1,57.7
+Cambridgeshire                      ,264,24.7,11.6,13.1,53
+Cambridge                           ,51,27.7,10.3,17.4,62.7
+East Cambridgeshire                 ,24,17.4,6.5,10.9,62.5
+Fenland                             ,66,40.2,26.8,13.4,33.3
+Huntingdonshire                     ,75,23.5,11.3,12.2,52
+South Cambridgeshire                ,48,18.3,6.1,12.2,66.7
+Essex                               ,745,29.2,12.6,16.7,57
+Basildon                            ,134,43.5,22,21.4,49.3
+Braintree                           ,75,28.8,12.7,16.1,56
+Brentwood                           ,16,11.2,,,
+Castle Point                        ,46,27.1,10.6,16.5,60.9
+Chelmsford                          ,86,26.7,10.3,16.5,61.6
+Colchester                          ,92,30,13.4,16.7,55.4
+Epping Forest                       ,51,23,5.9,17.1,74.5
+Harlow                              ,56,41.7,18.6,23.1,55.4
+Maldon                              ,37,33.3,16.2,17.1,51.4
+Rochford                            ,36,22.3,,,
+Tendring                            ,86,34.4,20.8,13.6,39.5
+Uttlesford                          ,30,19,5.1,13.9,73.3
+Hertfordshire                       ,502,23.9,10,13.9,58
+Broxbourne                          ,63,35.7,11.9,23.8,66.7
+Dacorum                             ,67,24.3,8.3,15.9,65.7
+East Hertfordshire                  ,54,19.1,6.4,12.8,66.7
+Hertsmere                           ,33,17.6,8,9.6,54.5
+North Hertfordshire                 ,45,19.2,12.4,6.8,35.6
+St Albans                           ,52,20.4,8.2,12.2,59.6
+Stevenage                           ,49,32,19.6,12.4,38.8
+Three Rivers                        ,34,19,5.6,13.4,70.6
+Watford                             ,39,26.3,10.8,15.5,59
+Welwyn Hatfield                     ,66,31.5,13.4,18.1,57.6
+Norfolk                             ,487,34.1,18.7,15.4,45.2
+Breckland                           ,75,33.7,20.7,13,38.7
+Broadland                           ,45,21.8,7.7,14,64.4
+Great Yarmouth                      ,92,56,33.5,22.5,40.2
+King's Lynn and West Norfolk        ,79,32.4,17.6,14.8,45.6
+North Norfolk                       ,44,27.1,11.7,15.4,56.8
+Norwich                             ,99,53.7,34.7,19,35.4
+South Norfolk                       ,53,21.6,9.8,11.8,54.7
+Suffolk                             ,344,26.5,13.1,13.4,50.6
+Babergh                             ,27,15.9,,,
+Forest Heath                        ,19,16.9,,,
+Ipswich                             ,86,38.2,20,18.2,47.7
+Mid Suffolk                         ,42,25.7,9.2,16.5,64.3
+St Edmundsbury                      ,49,27.1,13.8,13.3,49
+Suffolk Coastal                     ,37,15.6,5.1,10.6,67.6
+Waveney                             ,84,40.2,24.4,15.8,39.3
+Former county of Bedfordshire,283,37.7,17.3,20.4,54.1
+LONDON                              ,4414,37.1,13.9,23.2,62.5
+INNER LONDON                        ,1762,45.1,17.3,27.8,61.7
+Camden                              ,79,27.7,8.1,19.6,70.9
+Hackney and City of London          ,170,51.8,23.7,28,54.1
+City of London          ,170,51.8,23.7,28,54.1
+Hackney,170,51.8,23.7,28,54.1
+Hammersmith and Fulham              ,89,42.6,11.5,31.1,73
+Haringey                            ,203,64.7,24.5,40.2,62.1
+Islington                           ,105,44.9,20.1,24.8,55.2
+Kensington and Chelsea              ,30,15.6,6.2,9.4,60
+Lambeth                             ,204,58.1,21.6,36.4,62.7
+Lewisham                            ,198,48.6,21.6,27,55.6
+Newham                              ,190,47.2,19.4,27.8,58.9
+Southwark                           ,192,53.3,18.3,35,65.6
+Tower Hamlets                       ,101,31.8,11,20.7,65.3
+Wandsworth                          ,120,43.5,17,26.4,60.8
+Westminster                         ,81,35.4,10.1,25.3,71.6
+OUTER LONDON                        ,2652,33.3,12.3,20.9,63
+Barking and Dagenham                ,191,55.1,26.2,28.8,52.4
+Barnet                              ,131,21.8,7.3,14.5,66.4
+Bexley                              ,138,30.7,11.6,19.2,62.3
+Brent                               ,140,35.3,13.1,22.2,62.9
+Bromley                             ,143,26.4,9.2,17.1,65
+Croydon                             ,262,41.8,17.4,24.4,58.4
+Ealing                              ,123,25.7,8.8,16.9,65.9
+Enfield                             ,178,34.1,14.6,19.5,57.3
+Greenwich                           ,195,58.2,20.9,37.3,64.1
+Harrow                              ,86,22.7,7.1,15.5,68.6
+Havering                            ,156,33.5,10.9,22.5,67.3
+Hillingdon                          ,164,36.2,13,23.2,64
+Hounslow                            ,136,39.3,14.2,25.1,64
+Kingston upon Thames                ,65,26.3,8.5,17.8,67.7
+Merton                              ,88,30.4,11.4,19,62.5
+Redbridge                           ,153,30.4,11.1,19.3,63.4
+Richmond upon Thames                ,48,17.6,7,10.6,60.4
+Sutton                              ,88,24.6,9.2,15.4,62.5
+Waltham Forest                      ,167,45.7,13.1,32.6,71.3
+SOUTH EAST                          ,4384,28.3,13.7,14.6,51.8
+Bracknell Forest UA                 ,45,18.2,8.1,10.1,55.6
+Brighton and Hove UA                ,144,36.9,15.4,21.5,58.3
+Isle of Wight UA                    ,83,34.2,16.1,18.1,53
+Medway UA                           ,240,46,22.3,23.8,51.7
+Milton Keynes UA                    ,128,29.9,18.7,11.2,37.5
+Portsmouth UA                       ,132,43.3,26.3,17.1,39.4
+Reading UA                          ,95,40.9,24.1,16.8,41.1
+Slough UA                           ,79,36.8,14,22.8,62
+Southampton UA                      ,181,49.2,29.9,19.3,39.2
+West Berkshire UA                   ,71,19.4,9.8,9.6,49.3
+Windsor and Maidenhead UA           ,47,16.6,7.4,9.2,55.3
+Wokingham UA                        ,39,13.1,7.7,5.4,41
+Buckinghamshire                     ,195,20.2,8.2,12,59.5
+Aylesbury Vale                      ,67,20.3,11.5,8.8,43.3
+Chiltern                            ,29,16,,,
+South Bucks                         ,31,24.3,,,
+Wycombe                             ,68,20.7,7.9,12.8,61.8
+East Sussex                         ,292,31.3,13.2,18.1,57.9
+Eastbourne                          ,62,37.6,21.8,15.8,41.9
+Hastings                            ,76,45,24.3,20.7,46.1
+Lewes                               ,53,31.5,10.7,20.8,66
+Rother                              ,42,28.2,9.4,18.8,66.7
+Wealden                             ,59,21,5,16,76.3
+Hampshire                           ,593,25.2,13,12.3,48.6
+Basingstoke and Deane               ,84,30.2,16.5,13.7,45.2
+East Hampshire                      ,51,21.9,11.6,10.3,47.1
+Eastleigh                           ,71,30.7,16,14.7,47.9
+Fareham                             ,37,19.4,7.8,11.5,59.5
+Gosport                             ,55,38,21.4,16.6,43.6
+Hart                                ,23,14.3,7.4,6.8,47.8
+Havant                              ,85,40.2,21.3,18.9,47.1
+New Forest                          ,69,23.2,11.8,11.4,49.3
+Rushmoor                            ,35,20.6,12.3,8.2,40
+Test Valley                         ,49,22.5,10.6,11.9,53.1
+Winchester                          ,34,15.8,6.1,9.8,61.8
+Kent                                ,975,35.3,17.8,17.5,49.6
+Ashford                             ,79,36.1,17.8,18.3,50.6
+Canterbury                          ,70,25.3,11.2,14.1,55.7
+Dartford                            ,54,31.4,13.4,18,57.4
+Dover                               ,81,38.4,18.9,19.4,50.6
+Gravesham                           ,79,38.9,18.2,20.7,53.2
+Maidstone                           ,108,41.2,17.2,24.1,58.3
+Sevenoaks                           ,41,18,7,11,61
+Shepway                             ,90,50.1,29.5,20.6,41.1
+Swale                               ,104,39.7,21.8,18,45.2
+Thanet                              ,148,58.8,36.6,22.2,37.8
+Tonbridge and Malling               ,83,34.7,18,16.7,48.2
+Tunbridge Wells                     ,38,14.5,5.7,8.8,60.5
+Oxfordshire                         ,251,22,11.9,10.1,45.8
+Cherwell                            ,49,17.9,11,7,38.8
+Oxford                              ,71,29.1,13.5,15.6,53.5
+South Oxfordshire                   ,47,21,10.3,10.7,51.1
+Vale of White Horse                 ,45,21.4,13.3,8.1,37.8
+West Oxfordshire                    ,39,20.7,11.7,9,43.6
+Surrey                              ,424,20.8,7.7,13,62.7
+Elmbridge                           ,40,17.3,7.3,9.9,57.5
+Epsom and Ewell                     ,20,14.3,,,
+Guildford                           ,50,21.1,8.9,12.3,58
+Mole Valley                         ,39,24.8,3.8,21,84.6
+Reigate and Banstead                ,52,22.1,8.1,14,63.5
+Runnymede                           ,45,34.1,10.6,23.5,68.9
+Spelthorne                          ,53,34,13.5,20.5,60.4
+Surrey Heath                        ,28,17.4,6.8,10.5,60.7
+Tandridge                           ,23,12.7,,,
+Waverley                            ,32,12.8,6.4,6.4,50
+Woking                              ,42,26.3,10.7,15.7,59.5
+West Sussex                         ,370,26.4,10.9,15.6,58.9
+Adur                                ,30,25.3,13.5,11.8,46.7
+Arun                                ,90,39.1,19.1,20,51.1
+Chichester                          ,41,22.6,12.1,10.5,46.3
+Crawley                             ,77,39.8,13.4,26.4,66.2
+Horsham                             ,42,15.5,4.8,10.7,69
+Mid Sussex                          ,44,18.1,4.5,13.6,75
+Worthing                            ,46,28.5,12.4,16.1,56.5
+SOUTH WEST                          ,2813,29.9,15,14.9,49.9
+Bath and North East Somerset UA     ,61,19.4,8.3,11.1,57.4
+Bournemouth UA                      ,95,37.5,17.4,20.1,53.7
+"Bristol, City of UA                 ",256,42.2,23.4,18.8,44.5
+Cornwall UA and Isles of Scilly UA,309,32.9,18.4,14.5,44
+Cornwall UA,309,32.9,18.4,14.5,44
+Isles of Scilly UA,309,32.9,18.4,14.5,44
+Caradon                             ,44,29.3,12.6,16.6,56.8
+Carrick                             ,52,29.8,14.9,14.9,50
+Kerrier                             ,50,30.3,19.4,10.9,36
+North Cornwall                      ,53,33.8,21,12.7,37.7
+Penwith and Isles of Scilly         ,40,35.7,19.6,16.1,45
+Restormel                           ,70,38.7,22.6,16,41.4
+North Somerset UA                   ,114,32,15.4,16.6,51.8
+Plymouth UA                         ,188,44.5,24.4,20.1,45.2
+Poole UA                            ,85,33.9,16.7,17.1,50.6
+South Gloucestershire UA            ,121,25.2,10.6,14.6,57.9
+Swindon UA                          ,106,30,13.8,16.1,53.8
+Torbay UA                           ,109,46.6,22.6,23.9,51.4
+Wiltshire UA     ,251,26.4,13.5,12.9,49
+Kennet                              ,48,25.7,7.5,18.2,70.8
+North Wiltshire                     ,56,20.2,9.7,10.4,51.8
+Salisbury                           ,51,22.2,12.2,10,45.1
+West Wiltshire                      ,96,37.4,23,14.4,38.5
+Devon                               ,382,29,14.2,14.8,51
+East Devon                          ,65,27.7,10.6,17,61.5
+Exeter                              ,67,37.4,20.1,17.3,46.3
+Mid Devon                           ,45,31.6,14.1,17.6,55.6
+North Devon                         ,36,21.2,15.3,5.9,27.8
+South Hams                          ,35,23.7,7.4,16.2,68.6
+Teignbridge                         ,77,34,16.8,17.2,50.6
+Torridge                            ,32,26.5,17.4,9.1,34.4
+West Devon                          ,25,25.7,10.3,15.4,60
+Dorset                              ,175,22.3,10.3,12,53.7
+Christchurch                        ,24,30.9,11.6,19.3,62.5
+East Dorset                         ,18,11.5,3.8,7.6,66.7
+North Dorset                        ,29,19.9,9.6,10.3,51.7
+Purbeck                             ,19,24.4,10.3,14.1,57.9
+West Dorset                         ,40,18.9,8.5,10.4,55
+Weymouth and Portland               ,45,39.4,22.7,16.6,42.2
+Gloucestershire                     ,262,23.3,10.4,12.9,55.3
+Cheltenham                          ,40,15.4,7.3,8.1,52.5
+Cotswold                            ,23,14.5,5.7,8.8,60.9
+Forest of Dean                      ,44,29,12.5,16.5,56.8
+Gloucester                          ,76,35.8,17,18.9,52.6
+Stroud                              ,40,19.5,7.8,11.7,60
+Tewkesbury                          ,39,28.4,13.1,15.3,53.8
+Somerset                    ,299,29.2,15.4,13.8,47.2
+Mendip                              ,67,26.4,10.6,15.7,59.7
+Sedgemoor                           ,64,31,17.5,13.6,43.8
+South Somerset                      ,98,33.1,18.5,14.5,43.9
+Taunton Deane                       ,59,27.7,,,
+West Somerset                       ,11,19.9,,,
+WALES                               ,2081,37.7,20.9,16.8,44.5
+Isle of Anglesey                    ,42,34,18.6,15.4,45.2
+Gwynedd                             ,74,33.7,14.6,19.1,56.8
+Conwy                               ,77,38.7,22.1,16.6,42.9
+Denbighshire                        ,66,35.2,17.1,18.1,51.5
+Flintshire                          ,105,37.8,15.5,22.3,59
+Wrexham                             ,99,42.8,22.9,19.9,46.5
+Powys                               ,61,23.7,11.3,12.4,52.5
+Ceredigion                          ,29,22.7,9.4,13.3,58.6
+Pembrokeshire                       ,70,29.7,17,12.7,42.9
+Carmarthenshire                     ,110,32.5,19.2,13.3,40.9
+Swansea                             ,147,39.8,20.3,19.5,49
+Neath Port Talbot                   ,89,36,20.6,15.4,42.7
+Bridgend                            ,101,42.5,25.2,17.2,40.6
+Vale of Glamorgan                   ,79,31.9,18.2,13.7,43
+Cardiff                             ,264,47.1,27.5,19.6,41.7
+"Rhondda, Cynon, Taff                ",207,48.3,29.4,18.9,39.1
+Merthyr Tydfil                      ,49,44.5,30.9,13.6,30.6
+Caerphilly                          ,130,38.8,24.5,14.3,36.9
+Blaenau Gwent                       ,54,37.5,21.5,16,42.6
+Torfaen                             ,69,38.1,21,17.1,44.9
+Monmouthshire                       ,40,22.5,9,13.5,60
+Newport                             ,119,42.3,24.5,17.8,42

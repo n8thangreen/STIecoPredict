@@ -1,0 +1,1 @@
+list(alpha=-1.00000E+00, b.male=-1.00000E+00, b.student=0.00000E+00, b.IMD=0.00000E+00, b.hhsize1=0.00000E+00, tau.age=5.00000E-01, tau.ethngrp=1.00000E+00, tau.ons=2.00000E-01, tau.conception=3.00000E-01, tau.gor=1.00000E-01, tau.la=3.00000E+00, tau.met=3.00000E-01)

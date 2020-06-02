@@ -1,0 +1,18 @@
+
+   model
+    {
+    
+    # tau.car ~ dgamma(0.01, 0.001)
+
+    sd ~ dunif(0,10)
+    tau.car <- pow(sd,-2)
+
+    # neighbour contribution
+    for (nn in 1:sumNumNeigh) {
+      weights[nn] <- 1
+    }
+    # spatially structured errors
+    b.car[1:326] ~ car.normal(adj[], weights[], num[], tau.car)
+    
+    }
+    

@@ -1,0 +1,16 @@
+
+    model
+    {
+
+    # Priors
+    alpha ~ dnorm(0,0.01)
+    b.sex ~ dnorm(0,0.01)
+    b.age ~ dnorm(0,0.01)
+
+    # Likelihood
+    for (i in 1:n) {
+        cttestly[i] ~ dbin(p[i], N)        # Note p before N
+        logit(p[i]) <- alpha + b.sex*rsex[i] + b.age*dage[i]
+        }
+    }
+    

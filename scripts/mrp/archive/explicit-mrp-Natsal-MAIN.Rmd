@@ -1,0 +1,281 @@
+---
+output: word_document
+---
+
+
+```{r preamble}
+library(lme4)
+library(car)
+library(arm)
+library(pander)
+library(knitr)
+library(stargazer)
+library(xtable)
+library(lattice)
+library(plyr)
+
+library(STIecoPredict)
+
+# load("C:/Users/ngreen1/Dropbox/small-area & chlamydia/R_code/scripts/mrp/data/cleaned-regn-input-mrpNatsal.RData")
+load("./data/cleaned-regn-input-mrpNatsal.RData")
+```
+
+```{r Natsal}
+Natsal0 <- Natsal
+## older ages sparsely sampled
+Natsal <- subset(Natsal, age>15 & age<45)
+Natsal <- subset(Natsal, age>15 & age<25)   #NCSP range
+
+savedata <- FALSE
+```
+
+
+```{r main-model}
+fit <- glmer(formula = cttestly ~ 1+student+smokenow+ (1|sex:age)+(1|ethnic2)+(1|gor),
+              data = Natsal, family = binomial(link="logit"), weights = total_wt.int)
+```
+
+
+# Append predictions to joint distribution dataset
+
+```{r classif_probs}
+if(!exists(formula)){
+    formula <- paste(fit@call$formula, collapse = "")
+}
+
+## convert formula to fixed effect model with same variables
+TERMS <- attr(terms(fit@call$formula),"term.labels")
+TERMS <- unlist(strsplit(TERMS, split=" \\| "))
+TERMS <- unlist(strsplit(TERMS, split=":"))
+TERMS <- gsub(" ", "", TERMS, fixed = TRUE)
+TERMS <- TERMS[TERMS!="1" & TERMS!="gor"]
+
+fixeff.formula <- as.formula(paste("cttestly~",paste(TERMS, collapse = "+"),sep=""))
+
+## census data
+# test.calcTotalProbs(sim_prop_la)
+sim_prop_la <- STIecoPredict:::calcTotalProbs(formula=fixeff.formula, data=sim_prop_la, extracols = c("LAname","gor"))
+
+## select chunks appropriate for given model
+pred <- invlogit(fixef(fit)["(Intercept)"] +
+                     
+                     # (fixef(fit)["sexWomen"]*(sim_prop_la$sex=="Women")) +
+                     (fixef(fit)["studentTRUE"]*sim_prop_la$student) +
+                   
+                    # if(grep("+ethnic2", formula)==1){}
+                     # (fixef(fit)["studentTRUE:sexWomen"]*(sim_prop_la$sex=="Women" & sim_prop_la$student)) +
+                     # (fixef(fit)["ethnic2ASIAN/ASIAN BRITISH"]*(sim_prop_la$ethnic2=="ASIAN/ASIAN BRITISH")) +
+                     # (fixef(fit)["ethnic2BLACK/BLACK BRITISH"]*(sim_prop_la$ethnic2=="BLACK/BLACK BRITISH")) +
+                     # (fixef(fit)["ethnic2CHINESE"]*(sim_prop_la$ethnic2=="CHINESE")) +
+                     # (fixef(fit)["ethnic2MIXED"]*(sim_prop_la$ethnic2=="MIXED")) +
+                     # (fixef(fit)["ethnic2OTHER"]*(sim_prop_la$ethnic2=="OTHER")) +
+                     # (fixef(fit)["ethnic2NOT ANSWERED"]*(sim_prop_la$ethnic2=="NOT ANSWERED")) +
+                   
+                     (fixef(fit)["smokenowTRUE"]*sim_prop_la$smokenow) +
+                     
+                    # if(grep("+increasingdrinker", formula)==1){}                     
+                     # (fixef(fit)["increasingdrinkerTRUE"]*sim_prop_la$increasingdrinker)+
+                     
+                   # if(grep("\\(student|age\\)", formula)==1){}
+                     # (ranef(fit)$age[as.character(sim_prop_la$age),2]*sim_prop_la$student) +
+                   
+                   # if(grep("\\(1|ethnic2\\)", formula)==1){}
+                      ranef(fit)$ethnic2[as.character(sim_prop_la$ethnic2),1] +
+                   
+                   # if(grep("\\(1|sex:age\\)", formula)==1){}
+                      ranef(fit)$'sex:age'[paste(sim_prop_la$sex, sim_prop_la$age, sep=":"), 1] +
+                     
+                   # if(grep("\\(increasingdrinker|ethnic2\\)", formula)==1){}
+                      # ranef(fit)$ethnic2[as.character(sim_prop_la$ethnic2),"(Intercept)"] +
+                      # ranef(fit)$ethnic2[as.character(sim_prop_la$ethnic2),2]*sim_prop_la$increasingdrinker +
+    
+                   # if(grep("\\(ethnic2|age\\)", formula)==1){}
+                     # (ranef(fit)$age[as.character(sim_prop_la$age), "(Intercept)"]) +
+                     # (ranef(fit)$age[as.character(sim_prop_la$age), "ethnic2ASIAN/ASIAN BRITISH"]*(sim_prop_la$ethnic2=="ASIAN/ASIAN BRITISH")) +
+                     # (ranef(fit)$age[as.character(sim_prop_la$age), "ethnic2BLACK/BLACK BRITISH"]*(sim_prop_la$ethnic2=="BLACK/BLACK BRITISH")) +
+                     # (ranef(fit)$age[as.character(sim_prop_la$age), "ethnic2CHINESE"]*(sim_prop_la$ethnic2=="CHINESE")) +
+                     # (ranef(fit)$age[as.character(sim_prop_la$age), "ethnic2MIXED"]*(sim_prop_la$ethnic2=="MIXED")) +
+                     # (ranef(fit)$age[as.character(sim_prop_la$age), "ethnic2OTHER"]*(sim_prop_la$ethnic2=="OTHER")) +
+                     # (ranef(fit)$age[as.character(sim_prop_la$age), "ethnic2NOT ANSWERED"]*(sim_prop_la$ethnic2=="NOT ANSWERED")) +
+
+                   # if(grep("\\(1|age\\)", formula)==1){}
+                     # ranef(fit)$age[as.character(sim_prop_la$age),1] +
+                 
+                   # if(grep("\\(sex|age\\)", formula)==1){}
+                      # ranef(fit)$age[as.character(sim_prop_la$age),"(Intercept)"] +
+                      # ranef(fit)$age[as.character(sim_prop_la$age),2]*(sim_prop_la$sex=="Women") +
+                     
+                   # if(grep("\\(1|age.scaled\\)", formula)==1){}
+                     # ranef(fit)$age.scaled[as.character(sim_prop_la$age.scaled),1] +
+                   
+                   # if(grep("\\(1|gor\\)", formula)==1){}
+                     ranef(fit)$gor[as.character(sim_prop_la$gor),1]
+                   )
+```
+
+```{r weight_and_sum}
+## weight the probabilities by the subpopulation sizes and then sum by LA
+
+predweighted <- pred * sim_prop_la$totalprob
+LApred <- tapply(predweighted, sim_prop_la$LAname, sum)
+```
+
+The LA specific post-stratified estimates are then
+
+```{r LA_predictions}
+(LApred <- data.frame(LApred=LApred[order(LApred)]))
+```
+
+
+## Re-adjust for conditioning of ages between 16-24 only
+
+```{r LApred.adj}
+popCensus <- read.csv("..\\..\\packages\\STIecoPredict\\raw-data\\popCensus.csv")
+LApred$LAname <- rownames(LApred)
+popCensus$LAname <- STIecoPredict:::LAnameClean(popCensus$LAname)
+rownames(LApred) <- NULL
+LApred <- merge(LApred, popCensus[popCensus$Sex=="All", c("LAname","prob.25.and.over")], all.x=TRUE)
+LApred$LApred.adj <- LApred$LApred*(1-LApred$prob.25.and.over)
+
+LApred[order(LApred$LApred.adj),]
+```
+
+
+```{r, eval=savedata}
+save(pred, LApred, file="data/predictions.RData")
+```
+
+
+## Surveillance data
+
+Combine predictions with the surveillance data and produce summary statistics for each area.
+
+```{r all_joined_output}
+CTADGUM_pred <- STIecoPredict:::joinAllOutcomeData(LApred)
+CTADGUM_pred <- STIecoPredict:::calcStats.CTADGUM_pred(CTADGUM_pred)
+```
+
+```{r eval=savedata}
+save(CTADGUM_pred, file="data/CTADGUM_pred.RData")
+```
+
+
+## Some validation plots
+
+This is taken from Gelman (xxxx).
+We predict using the logistic fit without one of the covariates and then plot a separate line for each.
+
+
+```{r gor_model_validation}
+gor.names <- c("North East", #1
+               "North West", #2
+               "notused", #3
+               "Yorkshire and The Humber", #4
+               "East Midlands", #5
+               "West Midlands", #6
+               "South West", #7
+               "East", #8
+               "London", #9
+               "South East", #10
+               "Wales", #11
+               "Scotland") #12
+
+pred.logit <- (fixef(fit)["smokenowTRUE"]*sim_prop_la$smokenow) +
+               fixef(fit)["studentTRUE"]*sim_prop_la$student +
+               ranef(fit)$ethnic2[as.character(sim_prop_la$ethnic2),1] +
+               ranef(fit)$'sex:age'[paste(sim_prop_la$sex, sim_prop_la$age,sep=":"), 1]
+
+pred.logit.Natsal <- (fixef(fit)["smokenowTRUE"]*Natsal$smokenow) +
+                        fixef(fit)["studentTRUE"]*Natsal$student +
+                        ranef(fit)$ethnic2[as.character(Natsal$ethnic2),1] +
+                        ranef(fit)$'sex:age'[paste(Natsal$sex, Natsal$age,sep=":"), 1]
+
+pred.logit.upperCI <- ((fixef(fit)["smokenowTRUE"]+2*se.fixef(fit)["smokenowTRUE"])*sim_prop_la$smokenow) +
+                       (fixef(fit)["studentTRUE"]+2*se.fixef(fit)["studentTRUE"])*sim_prop_la$student +
+                       (ranef(fit)$ethnic2[as.character(sim_prop_la$ethnic2),1]+2*se.ranef(fit)$ethnic2[as.character(sim_prop_la$ethnic2),1]) +
+                       (ranef(fit)$'sex:age'[paste(sim_prop_la$sex, sim_prop_la$age,sep=":"), 1]+2*se.ranef(fit)$'sex:age'[paste(sim_prop_la$sex, sim_prop_la$age,sep=":"), 1])
+
+pred.logit.lowerCI <- ((fixef(fit)["smokenowTRUE"]-2*se.fixef(fit)["smokenowTRUE"])*sim_prop_la$smokenow) +
+                       (fixef(fit)["studentTRUE"]-2*se.fixef(fit)["studentTRUE"])*sim_prop_la$student +
+                       (ranef(fit)$ethnic2[as.character(sim_prop_la$ethnic2),1]-2*se.ranef(fit)$ethnic2[as.character(sim_prop_la$ethnic2),1]) +
+                       (ranef(fit)$'sex:age'[paste(sim_prop_la$sex, sim_prop_la$age,sep=":"), 1]-2*se.ranef(fit)$'sex:age'[paste(sim_prop_la$sex, sim_prop_la$age,sep=":"), 1])
+
+
+# par(mfrow=c(2,1))
+# par(mfrow=c(4,5))
+
+for (i in c(1,2,4,5,6,7,8,9,10)){
+    ## logistic curve
+    plot(NA, ylab="", xlab="", ylim=c(0,0.7), main=gor.names[i])
+    
+    lines(pred.logit[sim_prop_la$gor==i][order(pred[sim_prop_la$gor==i])], sort(pred[sim_prop_la$gor==i]))
+    lines(pred.logit.lowerCI[sim_prop_la$gor==i][order(pred[sim_prop_la$gor==i])], sort(pred[sim_prop_la$gor==i]), col="darkgrey")
+    lines(pred.logit.upperCI[sim_prop_la$gor==i][order(pred[sim_prop_la$gor==i])], sort(pred[sim_prop_la$gor==i]), col="darkgrey")
+    
+    ymin <- par("usr")[3]+0.05; ymax <- par("usr")[4]-0.05
+    points(pred.logit.Natsal[Natsal$gor==i],
+           (Natsal$cttestly[Natsal$gor==i] * (ymax-ymin)+runif(sum(Natsal$gor==i))/100) + ymin,
+           col=rgb(0.1,0.1,0.1,0.5))
+    
+    # hist(pred.logit.Natsal[Natsal$gor==i & Natsal$cttestly==0], breaks=20, col=rgb(0.1,0.1,0.1,0.5), main="", prob=T, xlim=c(-1,3),ylim=c(0,0.5), xlab="")
+    # hist(pred.logit.Natsal[Natsal$gor==i & Natsal$cttestly==1], breaks=10, col=rgb(0.8,0.8,0.8,0.5), add=T, prob=T)
+    
+    ## densities
+    plot(density(pred.logit.Natsal[Natsal$gor==i & Natsal$cttestly==0], prob=T, breaks=30), col="black", type="l", main=gor.names[i], xlim=c(-1,3),ylim=c(0,0.7), xlab="")
+    lines(density(pred.logit.Natsal[Natsal$gor==i & Natsal$cttestly==1], breaks=10), col="darkgrey")
+}
+
+```
+
+```{r ethnicity_model_validation}
+
+pred.logit <- (fixef(fit)["smokenowTRUE"]*sim_prop_la$smokenow) +
+                   fixef(fit)["studentTRUE"]*sim_prop_la$student +
+                         ranef(fit)$gor[as.character(sim_prop_la$gor),1] +
+               ranef(fit)$'sex:age'[paste(sim_prop_la$sex, sim_prop_la$age,sep=":"), 1]
+
+pred.logit.Natsal <- (fixef(fit)["smokenowTRUE"]*Natsal$smokenow) +
+                            fixef(fit)["studentTRUE"]*Natsal$student +
+                         ranef(fit)$gor[as.character(Natsal$gor),1] +
+                        ranef(fit)$'sex:age'[paste(Natsal$sex, Natsal$age,sep=":"), 1]
+
+# par(mfrow=c(2,1))
+# par(mfrow=c(3,4))
+
+for (i in levels(sim_prop_la$ethnic2)[1:6]){
+    ## logistic curve
+    plot(pred.logit[sim_prop_la$ethnic2==i][order(pred[sim_prop_la$ethnic2==i])], sort(pred[sim_prop_la$ethnic2==i]), type="l", ylab="", xlab="", ylim=c(0,0.65), main=i)
+    points(pred.logit.Natsal[Natsal$ethnic2==i], Natsal$cttestly[Natsal$ethnic2==i]*0.6+runif(sum(Natsal$ethnic2==i))/100, col=rgb(0.1,0.1,0.1,0.5))
+    
+    # hist(pred.logit.Natsal[Natsal$ethnic2==i & Natsal$cttestly==0], breaks=20, col=rgb(0.1,0.1,0.1,0.5), main="", prob=T, xlim=c(-1,3),ylim=c(0,0.5), xlab="")
+    # hist(pred.logit.Natsal[Natsal$ethnic2==i & Natsal$cttestly==1], breaks=10, col=rgb(0.8,0.8,0.8,0.5), add=T, prob=T)
+    
+    ## densities
+    plot(density(pred.logit.Natsal[Natsal$ethnic2==i & Natsal$cttestly==0]), col="black", type="l", main=i, xlim=c(0,2.5),ylim=c(0,0.7), xlab="")
+    lines(density(pred.logit.Natsal[Natsal$ethnic2==i & Natsal$cttestly==1]), col="darkgrey")
+}
+
+```
+
+
+# Simpler models
+
+##complete pooling
+```{r, eval=F}
+fit.pool <- lm(formula = cttestly ~ 1,
+          data = Natsal, family = binomial(link="logit"))
+```
+
+
+# No pooling: separate estimate within each Region
+```{r, eval=F}
+fit.gorpool <- list()
+for (i in unique(Natsal$gor)){
+        fit.gorpool[[i]] <- update(fit.pool, data=Natsal[Natsal$gor==i])
+
+    # fitsep[[i]] <- glmer(formula = cttestly ~ (1|sex)+(1|age)+(1|ethnic2)+smokenow+increasingdrinker+(1|gor),
+    #                   data = Natsal[Natsal$gor==1], family = binomial(link="logit"))
+}
+```
+
+

@@ -12,7 +12,7 @@ output: html_document
 
 ```{r}
 
-library(pbapply, quietly=TRUE)
+library(pbapply, quietly = TRUE)
 
 setwd("C:/Users/nathan.green/Documents/chlamydia/classifier")   #PHE homedrive
 # setwd("E:/NGreen/Chlamydia/classifier")   #usb
@@ -20,25 +20,28 @@ setwd("C:/Users/nathan.green/Documents/chlamydia/classifier")   #PHE homedrive
 
 ## data preprocessing and cleaning functions
 source("./R_code/Chlamydia_classifier/sim_logistic_regn/classifier_fns.R")
+```
 
-## --------------------------------------------------------
-## SETUP:
-## load-in functions, raw data and preprocess for analysis
-## --------------------------------------------------------
+## SETUP
 
+Load-in functions, raw data and preprocess for analysis
+
+
+```{r}
 # source("./data_config.R")
 setwd("./R_code/Chlamydia_classifier/sim_logistic_regn/workspaces/config")
-load(file=file.choose())
+load(file = file.choose())
 setwd("../../../../../")
+```
 
 
+## SIMULATE
 
-## --------------------------------------------------
-## SIMULATE:
-## simulate LA populations as weighted random samples
-## for use in NATSAL classifier prediction
-## --------------------------------------------------
+Simulate LA populations as weighted random samples
+for use in NATSAL classifier prediction
 
+
+```{r}
 ## slow!
 # source("./locallevel_pop_sim.R")
 
@@ -46,13 +49,14 @@ setwd("../../../../../")
 # load(file=file.choose())
 load("./data/output/LAsim/LAsim_submodel_1634_n10000.RData") #output
 # load("./data/output/LAsim/LAsim_submodel_1624_n10000.RData")
+```
 
 
-## -----------------------------------------------------
-## MODEL FIT:
-## STI risk factor regression/classifier of NATSAL data
-## -----------------------------------------------------
+## MODEL FIT
 
+STI risk factor regression/classifier of NATSAL data
+
+```{r}
 # source("./model_fitting.R")   ## deprecated
 
 # data.covshift <- pblapply(res, function(x) covariateShift(data[1:10000,], resla=x, riskfac))
@@ -60,32 +64,32 @@ load("./data/output/LAsim/LAsim_submodel_1634_n10000.RData") #output
 
 ## slow!l
 setwd("./data/output/fitmodel")
-load(file=file.choose())
+load(file = file.choose())
 setwd("../../../")
+```
 
 
+## PREDICT
 
-## ----------------------------------------------------
-## PREDICT:
-## regression prediction using simulated LA populations
-## takes the model fits from riskfactor_regn
-## ----------------------------------------------------
+Regression prediction using simulated LA populations
+takes the model fits from riskfactor_regn
 
+```{r}
 # source("./classpredict.R")
 # temp <- classPredict(fit.model, drink0=FALSE)
 
 setwd("./data/output/predictions")
-load(file=file.choose())
+load(file = file.choose())
 setwd("../../../")
+```
 
 
+## COMPARE
 
-## ---------------------------------------------------
-## COMPARE:
-## compare the estimated coverage from the classifiers
-## against the observed coverages
-## ---------------------------------------------------
+Compare the estimated coverage from the classifiers
+against the observed coverages
 
+```{r}
 # source("PLOTS_estimate_vs_data.R")
 # source("MAPS_estimate_vs_data.R")
 ```

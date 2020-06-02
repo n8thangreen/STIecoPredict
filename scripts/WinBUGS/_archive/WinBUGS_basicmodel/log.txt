@@ -1,0 +1,45 @@
+display(log)
+check(C:/Users/ngreen1/Dropbox/small-area & chlamydia/R_code/scripts/model.txt)
+model is syntactically correct
+data(C:/Users/ngreen1/Dropbox/small-area & chlamydia/R_code/scripts/data.txt)
+data loaded
+compile(3)
+model compiled
+inits(1,C:/Users/ngreen1/Dropbox/small-area & chlamydia/R_code/scripts/inits1.txt)
+chain initialized but other chain(s) contain uninitialized variables
+inits(2,C:/Users/ngreen1/Dropbox/small-area & chlamydia/R_code/scripts/inits2.txt)
+chain initialized but other chain(s) contain uninitialized variables
+inits(3,C:/Users/ngreen1/Dropbox/small-area & chlamydia/R_code/scripts/inits3.txt)
+model is initialized
+gen.inits()
+command #Bugs:gen.inits cannot be executed (is greyed out)
+thin.updater(2)
+update(100)
+set(alpha)
+set(b.sex)
+set(b.age)
+set(deviance)
+dic.set()
+update(500)
+coda(*,C:/Users/ngreen1/Dropbox/small-area & chlamydia/R_code/scripts/coda)
+stats(*)
+
+Node statistics
+	 node	 mean	 sd	 MC error	2.5%	median	97.5%	start	sample
+	alpha	2.577	0.1246	0.01155	2.332	2.582	2.817	101	1500
+	b.age	-0.1155	0.003319	2.766E-4	-0.122	-0.1157	-0.1089	101	1500
+	b.sex	-0.5971	0.05575	0.004125	-0.7063	-0.5951	-0.4881	101	1500
+	deviance	8590.0	2.411	0.1263	8587.0	8589.0	8596.0	101	1500
+dic.stats()
+
+DIC
+Dbar = post.mean of -2logL; Dhat = -2LogL at post.mean of stochastic nodes
+	Dbar	Dhat	pD	DIC	
+cttestly	8589.510	8586.610	2.904	8592.420	
+total	8589.510	8586.610	2.904	8592.420	
+history(*,C:/Users/ngreen1/Dropbox/small-area & chlamydia/R_code/scripts/history.odc)
+
+History
+
+save(C:/Users/ngreen1/Dropbox/small-area & chlamydia/R_code/scripts/log.odc)
+save(C:/Users/ngreen1/Dropbox/small-area & chlamydia/R_code/scripts/log.txt)

@@ -6,8 +6,12 @@
 #' @param input
 #'
 #' @return prop_props class object
-
-SimInputPropData <- function(input, formula=as.formula(cttestly ~ 1+Sex+Age+drink+smoke+ethnic2+student)){
+#' @export
+#'
+#' @examples
+#'
+SimInputPropData <- function(input,
+                             formula = as.formula(cttestly ~ 1 + Sex + Age + drink + smoke + ethnic2 + student)){
 
     stopifnot(as.list(input))
     stopifnot(is.formula(formula))
@@ -49,35 +53,37 @@ SimInputPropData <- function(input, formula=as.formula(cttestly ~ 1+Sex+Age+drin
 #' @param extracols Columns to retain but do nothing with
 #'
 #' @return data
+#' @export
 #'
 #' @examples
+#'
 calcTotalProbs <- function(formula, data=sim_prop_la,
                            extracols = c("LAname","la_code","region_code","region_name","gor")){
 
-    stopifnot(is.formula(formula))
+    stopifnot(plyr::is.formula(formula))
 
     colnames <- names(data)
     TERMS <- attr(terms(formula),"term.labels")
     p.TERMS <- paste("p.", TERMS, sep="")
     p.TERMS <- unique(gsub("(p.age)|(p.sex)", "p.agesex", p.TERMS)) #combine agesex probability
 
-    stopifnot(all(p.TERMS%in%colnames))
+    stopifnot(all(p.TERMS %in% colnames))
 
     newcolnames <- c(TERMS, p.TERMS, extracols)
-    dropl <- !colnames%in%newcolnames
+    dropl <- !colnames %in% newcolnames
     p.todrop <- dropl & grepl("^p\\.", names(data))
     factors.todrop <- gsub("p.", "", colnames[p.todrop])
 
     ## identify first level of each variable to drop because repetition
     # singlelevels <- apply(data[ ,factors.todrop, drop=FALSE], 2, function(x) levels(as.factor(x))[1]) ##TODO## why adds extra leading space??
-    singlelevels <- data[1, factors.todrop, drop=FALSE]
+    singlelevels <- data[1, factors.todrop, drop = FALSE]
 
     len.todrop <- length(factors.todrop)
     if(len.todrop>0){
-        data <- merge(data, singlelevels, al.x=FALSE, all.y=FALSE)
+        data <- merge(data, singlelevels, al.x = FALSE, all.y=FALSE)
     }
 
-    data$totalprob <- apply(data[ ,p.TERMS, drop=FALSE], 1, prod)
+    data$totalprob <- apply(data[ ,p.TERMS, drop = FALSE], 1, prod)
     # stopifnot(aggregate(totalprob, probs_levels_array$LAname, sum))
 
     data <- data[ ,c(newcolnames, "totalprob")]

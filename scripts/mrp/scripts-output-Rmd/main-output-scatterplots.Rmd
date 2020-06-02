@@ -1,0 +1,453 @@
+---
+title: "Other output plots for Natsal-mrp analysis"
+author: "Nathan Green"
+date: "5 May 2016"
+output: word_document
+editor_options: 
+  chunk_output_type: console
+---
+
+
+TODO:
+What does this script do?
+...
+
+
+```{r eval=FALSE}
+# load(file = "data/CTADGUM_pred-with-LA.RData")
+# load(file="data/CTADGUM_pred-no-place-effects.RData")
+load(file = "C:/Users/ngreen1/Dropbox/small_area_chlamydia/R_code/scripts/mrp/data/CTADGUM_pred-with-LA.RData")
+```
+
+```{r}
+SCALE <- 10
+
+mean.surveil <- mean(CTADGUM_pred$surv2011.1624, na.rm = TRUE)
+mean.Natsal <- mean(CTADGUM_pred$NatsalLA, na.rm = TRUE)
+mean.mrp <- mean(CTADGUM_pred$LApred, na.rm = TRUE)
+
+CTADGUM_pred$surv2011.1624 <- CTADGUM_pred$surv2011.1624/0.87*0.95
+```
+
+```{r direct_vs_pred_scatterplot}
+par(mfrow = c(1,2))
+
+plot(CTADGUM_pred$NatsalLA, CTADGUM_pred$LApred,
+     xlim = c(0,1), ylim = c(0,1),
+     cex = CTADGUM_pred$NatsalLAsize/SCALE, main = "(a)",
+     xlab = "Direct LA estimates using Natsal-3", ylab = "MRP estimates")
+abline(a = 0, b = 1)
+abline(lm(LApred ~ NatsalLA, data = CTADGUM_pred, weights = NatsalLAsize), lty = 2, col = "red")
+abline(lm(LApred ~ NatsalLA, data = CTADGUM_pred), lty = 2, col = "blue")
+
+
+# whats wtmean??
+
+plot(CTADGUM_pred$wtmean, CTADGUM_pred$LApred,
+     xlim = c(0,1), ylim = c(0,1),
+     cex = CTADGUM_pred$NatsalLAsize/SCALE, main = "(b)",
+     xlab = "Direct LA estimates using Natsal-3", ylab = "MRP estimates")
+abline(a = 0, b = 1)
+abline(lm(LApred ~ wtmean , CTADGUM_pred, weights = NatsalLAsize), lty = 2, col = "red")
+abline(lm(LApred ~ wtmean , CTADGUM_pred), lty = 2, col = "blue")
+```
+
+
+```{r pred_vs_surveill_scatterplot_2011_AB}
+par(mfrow = c(1,2))
+
+plot(CTADGUM_pred$LApred, CTADGUM_pred$surv2011.1624,
+     cex = CTADGUM_pred$NatsalLAsize/SCALE,
+     xlab = "MRP estimates", ylab = "",
+     # xlim=c(0.1,0.5), ylim=c(0.1,0.5))
+     # col=1+as.numeric(CTADGUM_pred$NatsalLAsize!=1.5),
+     xlim = c(0,0.6), ylim = c(0,0.6), cex.lab = 2, main = "(a)")
+
+abline(a = 0, b = 1, lty = 2, lwd = 2)
+abline(a = mean.surveil - mean.Natsal, b = 1, lty = 3, lwd = 2)
+abline(h = mean.Natsal, lty = 2)
+abline(h = mean.surveil, lty = 3)
+# text(x = c(0.15, 0.6, 0.1, 0.55),
+#      y = c(0.1, 0.32, 0.32, 0.5),
+#      labels = c("A","B","C","D"), cex = 1.8)
+points(mean.mrp, mean.surveil, col = "white", pch = 19, lwd = 2, cex = 3)
+points(mean.mrp, mean.surveil, col = "red", pch = 8, lwd = 2, cex = 2)
+arrows(0.5, mean.surveil, 0.5, mean.Natsal, code = 3)
+
+segments(CTADGUM_pred$LApred[CTADGUM_pred$'LA Name' == 'LEWISHAM'], CTADGUM_pred$surv2011.1624[CTADGUM_pred$'LA Name' == 'LEWISHAM'],
+         0.32, 0.59)
+text(0.32, 0.6, labels = "Lewisham")
+segments(CTADGUM_pred$LApred[CTADGUM_pred$'LA Name' == 'LAMBETH'], CTADGUM_pred$surv2011.1624[CTADGUM_pred$'LA Name' == 'LAMBETH'],
+         0.25, 0.54)
+text(0.23, 0.55, labels = "Lambeth")
+segments(CTADGUM_pred$LApred[CTADGUM_pred$'LA Name' == 'SOUTHWARK'], CTADGUM_pred$surv2011.1624[CTADGUM_pred$'LA Name' == 'SOUTHWARK'],
+         0.20, 0.46)
+text(0.20, 0.45, labels = "Southwark")
+
+polygon(c(-1, -1, mean.surveil), c(-1, mean.surveil, mean.surveil),    
+        col = rgb(0, 1, 1, 0.1), border = NA)
+
+polygon(c(mean.surveil, 0.8, 0.8), c(mean.surveil, mean.surveil, 0.8),    
+        col = rgb(0, 1, 1, 0.1), border = NA)
+
+title(ylab = "Recorded data", line = 2, cex.lab = 2)
+
+text(0.09, 0.2, "A", font = 2)
+text(0.55, 0.4, "B", font = 2)
+
+
+plot(CTADGUM_pred$LApred, CTADGUM_pred$surv2011.1624,
+     cex = CTADGUM_pred$NatsalLAsize/SCALE,
+     xlab = "MRP estimates", ylab = "",
+     # xlim=c(0.1,0.5), ylim=c(0.1,0.5))
+     # col=1+as.numeric(CTADGUM_pred$NatsalLAsize!=1.5),
+     xlim = c(0,0.6), ylim = c(0,0.6), cex.lab = 2, main = "(b)")
+
+abline(a = 0, b = 1, lty = 2, lwd = 2)
+abline(a = mean.surveil - mean.Natsal, b = 1, lty = 3, lwd = 2)
+abline(h = mean.Natsal, lty = 2)
+abline(h = mean.surveil, lty = 3)
+# text(x = c(0.15, 0.6, 0.1, 0.55),
+#      y = c(0.1, 0.32, 0.32, 0.5),
+#      labels = c("A","B","C","D"), cex = 1.8)
+points(mean.mrp, mean.surveil, col = "white", pch = 19, lwd = 2, cex = 3)
+points(mean.mrp, mean.surveil, col = "red", pch = 8, lwd = 2, cex = 2)
+arrows(0.5, mean.surveil, 0.5, mean.Natsal, code = 3)
+
+segments(CTADGUM_pred$LApred[CTADGUM_pred$'LA Name' == 'LEWISHAM'], CTADGUM_pred$surv2011.1624[CTADGUM_pred$'LA Name' == 'LEWISHAM'],
+         0.32, 0.59)
+text(0.32, 0.6, labels = "Lewisham")
+segments(CTADGUM_pred$LApred[CTADGUM_pred$'LA Name' == 'LAMBETH'], CTADGUM_pred$surv2011.1624[CTADGUM_pred$'LA Name' == 'LAMBETH'],
+         0.25, 0.54)
+text(0.23, 0.55, labels = "Lambeth")
+segments(CTADGUM_pred$LApred[CTADGUM_pred$'LA Name' == 'SOUTHWARK'], CTADGUM_pred$surv2011.1624[CTADGUM_pred$'LA Name' == 'SOUTHWARK'],
+         0.20, 0.46)
+text(0.20, 0.45, labels = "Southwark")
+
+polygon(c(-1, -1, mean.Natsal), c(-1.1, mean.surveil, mean.surveil),    
+        col = rgb(0, 1, 1, 0.1), border = NA)
+
+polygon(c(mean.Natsal, 0.8, 0.8), c(mean.surveil, mean.surveil, 0.71),    
+        col = rgb(0, 1, 1, 0.1), border = NA)
+
+title(ylab = "Recorded data", line = 2, cex.lab = 2)
+
+text(0.09, 0.2, "C", font = 2)
+text(0.55, 0.4, "D", font = 2)
+```
+
+```{r}
+# tranparent filled points; LA size scale
+plot(CTADGUM_pred$LApred, CTADGUM_pred$surv2011.1624,
+     xlab = "MRP estimates", ylab = "Surveillance data",
+     cex = CTADGUM_pred$NatsalLAsize/SCALE,
+     col = rgb(0, 0, 0, 0.3), pch = 16,
+     # xlim=c(0.1,0.5), ylim=c(0.1,0.5))
+     # col=1+as.numeric(CTADGUM_pred$NatsalLAsize!=1.5),
+     xlim = c(0,1), ylim = c(0,1))
+abline(a = 0, b = 1)
+
+# tranparent filled points
+plot(CTADGUM_pred$LApred, CTADGUM_pred$surv2011.1624,
+     xlab = "MRP estimates", ylab = "Surveillance data",
+     col = rgb(0, 0, 0, 0.3), pch = 16,
+     # xlim=c(0.1,0.5), ylim=c(0.1,0.5))
+     # col=1+as.numeric(CTADGUM_pred$NatsalLAsize!=1.5),
+     xlim = c(0,1), ylim = c(0,1))
+abline(a = 0, b = 1, lty = 2, lwd = 2)
+abline(a = mean.surveil - mean.Natsal, b = 1, lty = 3, lwd = 2)
+abline(h = mean.Natsal, lty = 2)
+abline(h = mean.surveil, lty = 3)
+text(x = c(0.25, 0.5, 0.25, 0.45),
+     y = c(0.2, 0.3, 0.34, 0.4),
+     labels = c("A","B","C","D"))
+
+# outliers <- subset(CTADGUM_pred, surv2011.1624>0.5 | LApred>0.5)
+
+# text(outliers$LApred, outliers$surv2011.1524+0.03,
+#      seq_along(outliers$`LA Name`),
+#      # CTADGUM_pred$`LA Name`[outlier], cex=0.5)
+#      col="blue")
+
+# paste(seq_along(CTADGUM_pred$`LA Name`), CTADGUM_pred$`LA Name`)
+# legend(0, y=1, legend = paste(seq_along(outliers$`LA Name`), outliers$`LA Name`), cex=0.5, bty="n")
+# points(CTADGUM_pred$surv2011.1624, CTADGUM_pred$LApred, col="red")
+# points(CTADGUM_pred$surv2012.1524, CTADGUM_pred$LApred, col="blue")
+# points(CTADGUM_pred$surv2013.1524, CTADGUM_pred$LApred, col="green")
+```
+
+```{r pred_vs_surveill_scatterplot_2012}
+par(mfrow = c(1,1))
+
+plot(CTADGUM_pred$LApred, CTADGUM_pred$surv2012.1524,
+     cex = CTADGUM_pred$NatsalLAsize/SCALE,
+     xlab = "MRP estimates", ylab = "Surveillance data",
+     # xlim=c(0.1,0.5), ylim=c(0.1,0.5))
+     # col=1+as.numeric(CTADGUM_pred$NatsalLAsize!=1.5),
+     xlim = c(0,1), ylim = c(0,1))
+abline(a = 0, b = 1, lty = 2, lwd = 2)
+abline(a = mean.surveil - mean.Natsal, b = 1, lty = 3, lwd = 2)
+abline(h = mean.Natsal, lty = 2)
+abline(h = mean.surveil, lty = 3)
+text(x = c(0.25, 0.5, 0.25, 0.45),
+     y = c(0.2, 0.3, 0.34, 0.4),
+     labels = c("A","B","C","D"),
+     cex = 1.8)
+```
+
+```{r pred_vs_surveill_scatterplot-numbers}
+plot(CTADGUM_pred$LApred, CTADGUM_pred$surv2011.1624,
+     xlab = "MRP estimates", ylab = "Surveillance data",
+     xlim = c(0,1), ylim = c(0,1), type = "n")
+abline(a = 0, b = 1)
+
+text(CTADGUM_pred$LApred, CTADGUM_pred$surv2011.1624,
+     labels = CTADGUM_pred$laname.num,
+     # CTADGUM_pred$`LA Name`[outlier], cex=0.5)
+     col = "black")
+
+#paste(seq_along(CTADGUM_pred$`LA Name`[!is.na(CTADGUM_pred$LApred)]), CTADGUM_pred$`LA Name`[!is.na(CTADGUM_pred$LApred)])
+#legend(col=0,x=0.7, y=1.05, pch=rep(26,32),
+#       legend = paste(seq_along(outliers$`LA Name`[!is.na(CTADGUM_pred$LApred)]), CTADGUM_pred$`LA Name`[!is.na(CTADGUM_pred$LApred)]), cex=0.5, bty="n")
+```
+
+
+```{r direct_vs_surveill_scatterplot}
+plot(CTADGUM_pred$NatsalLA[!is.na(CTADGUM_pred$LApred)], CTADGUM_pred$surv2011.1624[!is.na(CTADGUM_pred$LApred)],
+     xlim=c(0,1), ylim=c(0,1),
+     cex = CTADGUM_pred$NatsalLAsize[!is.na(CTADGUM_pred$LApred)]/SCALE,
+     xlab = "Direct LA estimates using Natsal-3", ylab = "Surveillance data")
+abline(a = 0, b = 1)
+abline(lm(CTADGUM_pred$surv2011.1624[!is.na(CTADGUM_pred$LApred)] ~ CTADGUM_pred$NatsalLA[!is.na(CTADGUM_pred$LApred)],
+          weights = CTADGUM_pred$NatsalLAsize[!is.na(CTADGUM_pred$LApred)]), lty = 2, col = "red")
+abline(lm(CTADGUM_pred$surv2011.1624[!is.na(CTADGUM_pred$LApred)] ~ CTADGUM_pred$NatsalLA[!is.na(CTADGUM_pred$LApred)]), lty = 2, col = "blue")
+```
+
+```{r direct_vs_surveill_scatterplot_numbered}
+par(mfrow = c(1,2))
+
+plot(CTADGUM_pred$NatsalLA[!is.na(CTADGUM_pred$LApred)], CTADGUM_pred$surv2011.1624[!is.na(CTADGUM_pred$LApred)], xlim=c(0,1), ylim=c(0,1), type="n",
+     xlab="Direct LA estimates using Natsal-3", ylab="Surveillance data")
+abline(a=0, b=1)
+
+text(CTADGUM_pred$NatsalLA[!is.na(CTADGUM_pred$LApred)], CTADGUM_pred$surv2011.1624[!is.na(CTADGUM_pred$LApred)],
+          CTADGUM_pred$laname.num[!is.na(CTADGUM_pred$LApred)],
+     col="black")
+
+
+plot(CTADGUM_pred$LApred[!is.na(CTADGUM_pred$LApred)], CTADGUM_pred$surv2011.1624[!is.na(CTADGUM_pred$LApred)],
+          xlab="MRP estimates", ylab="Surveillance data",
+     xlim=c(0,1), ylim=c(0,1), type="n")
+abline(a=0, b=1)
+
+text(CTADGUM_pred$LApred[!is.na(CTADGUM_pred$LApred)], CTADGUM_pred$surv2011.1624[!is.na(CTADGUM_pred$LApred)],
+          CTADGUM_pred$laname.num[!is.na(CTADGUM_pred$LApred)],
+     col="black")
+paste(seq_along(CTADGUM_pred$`LA Name`[!is.na(CTADGUM_pred$LApred)]), CTADGUM_pred$`LA Name`[!is.na(CTADGUM_pred$LApred)])
+legend(col=0,x=0.5, y=1.05, legend = paste(seq_along(CTADGUM_pred$`LA Name`[!is.na(CTADGUM_pred$LApred)]), CTADGUM_pred$`LA Name`[!is.na(CTADGUM_pred$LApred)]), cex=0.5, bty="n")
+```
+
+
+
+```{r LA_densities, eval=FALSE}
+par(mfrow = c(1,1))
+
+plot(density(CTADGUM_pred$LApred, bw=0.04, na.rm=T),
+     col = "red",
+     xlim = c(0, 1),
+     ylim = c(0, 10),
+     xlab = "Probability test for chlamydia in previous year",
+     main = "")
+
+# abline(v=median(CTADGUM_pred$LApred, na.rm=T), col="red", lty=2)
+# lines(density(CTADGUM_pred$surv2011.1524, bw=0.05, na.rm = T))
+# lines(density(CTADGUM_pred$surv2012.1634, bw=0.05, na.rm = T))
+# lines(density(CTADGUM_pred$surv2012.1524, bw=0.05, na.rm = T))
+# lines(density(CTADGUM_pred$surv2013.1524, bw=0.05, na.rm = T))
+lines(density(CTADGUM_pred$surv2011.1624, bw = 0.05, na.rm = T), lty = 2)
+lines(density(NatsalLA$value, bw = 0.1, na.rm = T, from = 0, to = 1), col = "blue", lty = 3)
+# abline(v=median(NatsalLA, na.rm = T), col="blue", lty=2)
+```
+
+```{r paired_scatterplots_all_surveill}
+library(ggplot2)
+
+my_line <- function(x,y,...){
+    points(x,y,...)
+    abline(a = 0,b = 1,...)
+}
+
+pairs(CTADGUM_pred[,c("surv2011.1524","surv2012.1524","surv2013.1524")], lower.panel = my_line, upper.panel = my_line)
+
+pairs(CTADGUM_pred[,c("surv2011.1524","surv2012.1524","surv2013.1524")], lower.panel = my_line, upper.panel = my_line, log = "xy")
+
+
+## ggplot version
+
+my_fn <- function(data, mapping, ...) {
+  p <-  ggplot(data = data, mapping = mapping) + geom_point() + 
+    geom_abline(slope = 1, intercept = 0) +
+    xlim(0, 1) + ylim(0, 1)
+  p
+}
+
+GGally::ggpairs(CTADGUM_pred[,c("surv2011.1524","surv2012.1524","surv2013.1524")], lower = list(continuous = my_fn))
+```
+
+```{r pred_vs_surveill_scatterplot-different-years}
+
+x11()
+par(mfrow = c(2,2),
+    mai = c(0.7, 0.7, 0.5, 0.5))
+
+outliers <- CTADGUM_pred$surv2011.1624 > 0.4 | CTADGUM_pred$LApred > 0.5 | CTADGUM_pred$LApred < 0.0
+
+plot(CTADGUM_pred$LApred, CTADGUM_pred$surv2011.1624,
+     xlab = "MRP estimates", ylab = "Surveillance data", main = "surv2011.1624",#main="(a)",
+     xlim = c(0,1), ylim = c(0,1), type = "n")
+abline(a = 0, b = 1)
+text(CTADGUM_pred$LApred, CTADGUM_pred$surv2011.1624,
+     labels = CTADGUM_pred$laname.num,
+     col = "black")
+abovediag <- CTADGUM_pred$surv2011.1624>CTADGUM_pred$LApred
+belowdiag <- CTADGUM_pred$surv2011.1624<CTADGUM_pred$LApred
+#legend(col=0, x=0.45, y=1.05, title="Above", title.adj = 0.2, legend = paste(na.omit(CTADGUM_pred$laname.num[outliers & abovediag]), na.omit(CTADGUM_pred$`LA Name`[outliers & abovediag])), cex=0.6, bty="n")
+#legend(col=0, x=0.7, y=1.05, title="Above", title.adj = 0.2, legend = paste(na.omit(CTADGUM_pred$laname.num[outliers & belowdiag]), na.omit(CTADGUM_pred$`LA Name`[outliers & belowdiag])), cex=0.6, bty="n")
+
+outliers <- CTADGUM_pred$surv2011.1524>0.4 | CTADGUM_pred$LApred>0.5 | CTADGUM_pred$LApred<0.0
+plot(CTADGUM_pred$LApred, CTADGUM_pred$surv2011.1524,
+          xlab="MRP estimates", ylab="Surveillance data", main="surv2011.1524",#main="(b)",
+     xlim=c(0,1), ylim=c(0,1), type="n")
+abline(a=0, b=1)
+text(CTADGUM_pred$LApred, CTADGUM_pred$surv2011.1524,
+     CTADGUM_pred$laname.num,
+     col="black")
+abovediag <- CTADGUM_pred$surv2011.1524>CTADGUM_pred$LApred
+belowdiag <- CTADGUM_pred$surv2011.1524<CTADGUM_pred$LApred
+#legend(col=0, x=0.45, y=1.05, title="Above", title.adj = 0.2, legend = paste(na.omit(CTADGUM_pred$laname.num[outliers & abovediag]), na.omit(CTADGUM_pred$`LA Name`[outliers & abovediag])), cex=0.6, bty="n")
+#legend(col=0, x=0.7, y=1.05, title="Below", title.adj = 0.2, legend = paste(na.omit(CTADGUM_pred$laname.num[outliers & belowdiag]), na.omit(CTADGUM_pred$`LA Name`[outliers & belowdiag])), cex=0.6, bty="n")
+
+outliers <- CTADGUM_pred$surv2012.1524>0.4 | CTADGUM_pred$LApred>0.5 | CTADGUM_pred$LApred<0.0
+plot(CTADGUM_pred$LApred, CTADGUM_pred$surv2012.1524,
+          xlab="MRP estimates", ylab="Surveillance data", main="surv2012.1524",#main="(c)",
+     xlim=c(0,1), ylim=c(0,1), type="n")
+abline(a=0, b=1)
+text(CTADGUM_pred$LApred, CTADGUM_pred$surv2012.1524,
+     CTADGUM_pred$laname.num,
+     col="black")
+abovediag <- CTADGUM_pred$surv2012.1524>CTADGUM_pred$LApred
+belowdiag <- CTADGUM_pred$surv2012.1524<CTADGUM_pred$LApred
+#legend(col=0, x=0.45, y=1.05, title="Above", title.adj = 0.2, legend = paste(na.omit(CTADGUM_pred$laname.num[outliers & abovediag]), na.omit(CTADGUM_pred$`LA Name`[outliers & abovediag])), cex=0.6, bty="n")
+#legend(col=0, x=0.7, y=1.05, title="Below", title.adj = 0.2, legend = paste(na.omit(CTADGUM_pred$laname.num[outliers & belowdiag]), na.omit(CTADGUM_pred$`LA Name`[outliers & belowdiag])), cex=0.6, bty="n")
+
+outliers <- CTADGUM_pred$surv2013.1524>0.4 | CTADGUM_pred$LApred>0.5 | CTADGUM_pred$LApred<0.0
+plot(CTADGUM_pred$LApred, CTADGUM_pred$surv2013.1524,
+          xlab="MRP estimates", ylab="Surveillance data", main="surv2013.1524",#main="(d)",
+     xlim=c(0,1), ylim=c(0,1), type="n")
+abline(a=0, b=1)
+text(CTADGUM_pred$LApred, CTADGUM_pred$surv2013.1524,
+     CTADGUM_pred$laname.num,
+     col="black")
+abovediag <- CTADGUM_pred$surv2013.1524>CTADGUM_pred$LApred
+belowdiag <- CTADGUM_pred$surv2013.1524<CTADGUM_pred$LApred
+#legend(col=0, x=0.45, y=1.05, title="Above", title.adj = 0.2, legend = paste(na.omit(CTADGUM_pred$laname.num[outliers & abovediag]), na.omit(CTADGUM_pred$`LA Name`[outliers & abovediag])), cex=0.6, bty="n")
+#legend(col=0, x=0.7, y=1.05, title="Below", title.adj = 0.2, legend = paste(na.omit(CTADGUM_pred$laname.num[outliers & belowdiag]), na.omit(CTADGUM_pred$`LA Name`[outliers & belowdiag])), cex=0.6, bty="n")
+```
+
+
+```{r pred_vs_surveill_scatterplot_BY-REGION}
+x11()
+par(mfrow = c(3,3),
+    mai = c(0.7, 0.6, 0.2, 0.2))
+
+Regions <- c("North West", "Yorkshire and The Humber"  , "North East" , "West Midlands"  ,"East Midlands" ,"East of England" , "South West", "London"  ,"South East")
+
+plot(CTADGUM_pred$LApred[CTADGUM_pred$Region==Regions[1]], CTADGUM_pred$surv2011.1624[CTADGUM_pred$Region==Regions[1]],
+          xlab="MRP estimates", ylab="Recorded data", main=Regions[1],
+     xlim=c(0,1), ylim=c(0,1), type="n", cex.lab = 1.5)
+text(CTADGUM_pred$LApred[CTADGUM_pred$Region==Regions[1]], CTADGUM_pred$surv2011.1624[CTADGUM_pred$Region==Regions[1]],
+     CTADGUM_pred$LAnum_inregion[CTADGUM_pred$Region==Regions[1]],
+     # CTADGUM_pred$`LA Name`[outlier], cex=0.5)
+     col="black")
+abline(a=0, b=1)
+
+plot(CTADGUM_pred$LApred[CTADGUM_pred$Region==Regions[2]], CTADGUM_pred$surv2011.1624[CTADGUM_pred$Region==Regions[2]], cex=CTADGUM_pred$NatsalLAsize/SCALE,
+          xlab="MRP estimates", ylab="Recorded data", main=Regions[2],
+     xlim=c(0,1), ylim=c(0,1), type="n", cex.lab = 1.5)
+text(CTADGUM_pred$LApred[CTADGUM_pred$Region==Regions[2]], CTADGUM_pred$surv2011.1624[CTADGUM_pred$Region==Regions[2]],
+     CTADGUM_pred$LAnum_inregion[CTADGUM_pred$Region==Regions[2]],
+     # CTADGUM_pred$`LA Name`[outlier], cex=0.5)
+     col="black")
+abline(a=0, b=1)
+
+plot(CTADGUM_pred$LApred[CTADGUM_pred$Region==Regions[3]], CTADGUM_pred$surv2011.1624[CTADGUM_pred$Region==Regions[3]], cex=CTADGUM_pred$NatsalLAsize/SCALE,
+          xlab="MRP estimates", ylab="Recorded data", main=Regions[3],
+     xlim=c(0,1), ylim=c(0,1), type="n", cex.lab = 1.5)
+text(CTADGUM_pred$LApred[CTADGUM_pred$Region==Regions[3]], CTADGUM_pred$surv2011.1624[CTADGUM_pred$Region==Regions[3]],
+     CTADGUM_pred$LAnum_inregion[CTADGUM_pred$Region==Regions[3]],
+     # CTADGUM_pred$`LA Name`[outlier], cex=0.5)
+     col="black")
+abline(a=0, b=1)
+
+plot(CTADGUM_pred$LApred[CTADGUM_pred$Region==Regions[4]], CTADGUM_pred$surv2011.1624[CTADGUM_pred$Region==Regions[4]], cex=CTADGUM_pred$NatsalLAsize/SCALE,
+          xlab="MRP estimates", ylab="Recorded data", main=Regions[4],
+     xlim=c(0,1), ylim=c(0,1), type="n", cex.lab = 1.5)
+text(CTADGUM_pred$LApred[CTADGUM_pred$Region==Regions[4]], CTADGUM_pred$surv2011.1624[CTADGUM_pred$Region==Regions[4]],
+     CTADGUM_pred$LAnum_inregion[CTADGUM_pred$Region==Regions[4]],
+     # CTADGUM_pred$`LA Name`[outlier], cex=0.5)
+     col="black")
+abline(a=0, b=1)
+
+plot(CTADGUM_pred$LApred[CTADGUM_pred$Region==Regions[5]], CTADGUM_pred$surv2011.1624[CTADGUM_pred$Region==Regions[5]], cex=CTADGUM_pred$NatsalLAsize/SCALE,
+          xlab="MRP estimates", ylab="Recorded data", main=Regions[5],
+     xlim=c(0,1), ylim=c(0,1), type="n", cex.lab = 1.5)
+text(CTADGUM_pred$LApred[CTADGUM_pred$Region==Regions[5]], CTADGUM_pred$surv2011.1624[CTADGUM_pred$Region==Regions[5]],
+     CTADGUM_pred$LAnum_inregion[CTADGUM_pred$Region==Regions[5]],
+     # CTADGUM_pred$`LA Name`[outlier], cex=0.5)
+     col="black")
+abline(a=0, b=1)
+
+plot(CTADGUM_pred$LApred[CTADGUM_pred$Region==Regions[6]], CTADGUM_pred$surv2011.1624[CTADGUM_pred$Region==Regions[6]], cex=CTADGUM_pred$NatsalLAsize/SCALE,
+          xlab="MRP estimates", ylab="Recorded data", main=Regions[6],
+     xlim=c(0,1), ylim=c(0,1), type="n", cex.lab = 1.5)
+text(CTADGUM_pred$LApred[CTADGUM_pred$Region==Regions[6]], CTADGUM_pred$surv2011.1624[CTADGUM_pred$Region==Regions[6]],
+     CTADGUM_pred$LAnum_inregion[CTADGUM_pred$Region==Regions[6]],
+     # CTADGUM_pred$`LA Name`[outlier], cex=0.5)
+     col="black")
+abline(a=0, b=1)
+
+plot(CTADGUM_pred$LApred[CTADGUM_pred$Region==Regions[7]], CTADGUM_pred$surv2011.1624[CTADGUM_pred$Region==Regions[7]], cex=CTADGUM_pred$NatsalLAsize/SCALE,
+          xlab="MRP estimates", ylab="Recorded data", main=Regions[7],
+     xlim=c(0,1), ylim=c(0,1), type="n", cex.lab = 1.5)
+text(CTADGUM_pred$LApred[CTADGUM_pred$Region==Regions[7]], CTADGUM_pred$surv2011.1624[CTADGUM_pred$Region==Regions[7]],
+     CTADGUM_pred$LAnum_inregion[CTADGUM_pred$Region==Regions[7]],
+     # CTADGUM_pred$`LA Name`[outlier], cex=0.5)
+     col="black")
+abline(a=0, b=1)
+
+plot(CTADGUM_pred$LApred[CTADGUM_pred$Region==Regions[8]], CTADGUM_pred$surv2011.1624[CTADGUM_pred$Region==Regions[8]], cex=CTADGUM_pred$NatsalLAsize/SCALE,
+          xlab="MRP estimates", ylab="Recorded data", main=Regions[8],
+     xlim=c(0,1), ylim=c(0,1), type="n", cex.lab = 1.5)
+text(CTADGUM_pred$LApred[CTADGUM_pred$Region==Regions[8]], CTADGUM_pred$surv2011.1624[CTADGUM_pred$Region==Regions[8]],
+     CTADGUM_pred$LAnum_inregion[CTADGUM_pred$Region==Regions[8]],
+     # CTADGUM_pred$`LA Name`[outlier], cex=0.5)
+     col="black")
+abline(a=0, b=1)
+
+plot(CTADGUM_pred$LApred[CTADGUM_pred$Region==Regions[9]], CTADGUM_pred$surv2011.1624[CTADGUM_pred$Region==Regions[9]], cex=CTADGUM_pred$NatsalLAsize/SCALE,
+          xlab="MRP estimates", ylab="Recorded data", main=Regions[9],
+     xlim=c(0,1), ylim=c(0,1), type="n", cex.lab = 1.5)
+text(CTADGUM_pred$LApred[CTADGUM_pred$Region==Regions[9]], CTADGUM_pred$surv2011.1624[CTADGUM_pred$Region==Regions[9]],
+     CTADGUM_pred$LAnum_inregion[CTADGUM_pred$Region==Regions[9]],
+     # CTADGUM_pred$`LA Name`[outlier], cex=0.5)
+     col="black")
+abline(a=0, b=1)
+```
+
+```{r la-region-plot-lookup-table}
+library(pander)
+tab <- with(CTADGUM_pred, data.frame(Region, `LA Name`, LAnum_inregion, laname.num))
+pandoc.table(tab[order(tab$Region, tab$LAnum_inregion, tab$laname.num),], style="multiline", emphasize.rownames=T, split.table=Inf)
+write.csv(tab[order(tab$Region, tab$LAnum_inregion, tab$laname.num),], file="la-region-plot-lookup.csv")
+```
+

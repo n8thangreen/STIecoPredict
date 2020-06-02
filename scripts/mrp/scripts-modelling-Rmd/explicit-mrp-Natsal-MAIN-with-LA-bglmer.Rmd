@@ -1,0 +1,471 @@
+---
+title: MRP analysis at LA level with Natsal3 data
+output: word_document
+author: N Green
+editor_options: 
+  chunk_output_type: console
+---
+
+
+```{r preamble}
+library(lme4)
+library(car)
+library(arm)
+library(pander)
+library(knitr)
+library(stargazer)
+library(xtable)
+library(lattice)
+library(plyr)
+library(blme)
+# library(reshape)
+library(reshape2)
+library(optimx)
+
+library(STIecoPredict)
+```
+
+```{r}
+load("C:/Users/ngreen1/Dropbox/small_area_chlamydia/R_code/scripts/mrp/data/cleaned-regn-input-mrpNatsal.RData")
+
+Natsal0 <- Natsal
+```
+
+```{r}
+savedata <- FALSE
+showplot <- TRUE
+```
+
+```{r Natsal-subsets}
+## older ages sparsely sampled
+Natsal <- subset(Natsal, age > 15 & age < 25)   #NCSP range
+
+## opposite sex partner in last year only
+Natsal <- subset(Natsal, sam1yr == 0)
+
+Natsal$sex1yr <- (Natsal$het1yr != 0 | Natsal$sam1yr != 0)
+
+Natsal$GUMvenue <- (Natsal$chtstwh1 == "Sexual health clinic (GUM clinic)" | Natsal$chltstwh == "Sexual health clinic (GUM clinic)")
+
+## subset GUM or non-GUM only
+# Natsal2 <- subset(Natsal, (GUMvenue  & cttestly==TRUE) | cttestly==FALSE)
+# Natsal2 <- subset(Natsal, (!GUMvenue & cttestly==TRUE) | cttestly==FALSE)
+
+# names.atleast1test <- rownames(table(Natsal$laname, Natsal$cttestly))[table(Natsal$laname, Natsal$cttestly)[,"1"]>0]
+# names.LAbigenough <- names(table(Natsal$laname)[(table(Natsal$laname))>10])
+# 
+# subnames <- names.LAbigenough[names.LAbigenough%in%names.atleast1test]
+# Natsal2  <- subset(Natsal, laname%in%subnames)
+Natsal2 <- Natsal
+```
+
+```{r glmer-model-logistic, eval=FALSE}
+fit <- lme4::glmer(
+    formula = cttestly ~ 1 + sex + (1|sex.age) + (1|ethnic2) + I(hhsize == 1) + student +
+                       (1|Conception.decile) +  (1|`Numerical classification`) + I(`Average Score` > 28) +
+                        (1|laname) + (1|gor) + (1|metcounty_UA), # + I(gor==9) ,
+    family = binomial(link = "logit"),
+    data = Natsal2)
+```
+
+```{r bglmer-model-logistic, eval=TRUE}
+## >28 is 75% IMD quantile
+fit <- blme::bglmer(
+    formula = cttestly ~ 1 + sex + (1|sex.age) + (1|ethnic2) + student + I(hhsize == 1) + (1|Conception.decile) +
+                        (1|`Numerical classification`) + (1|laname) + (1|gor) + I(`Average Score` > 28) + (1|metcounty_UA), # + I(gor==9) ,
+    maxit = 10000L,
+    
+    # control = glmerControl(optimizer = "bobyqa"),
+    control = lme4::glmerControl(optimizer = "Nelder_Mead"),
+    # control = glmerControl(optimizer = "optimx", optCtrl=list(method = "nlminb"),
+    # control = glmerControl(optimizer = "optimx", optCtrl=list(method = "L-BFGS-B"),
+    
+    family = binomial(link = "logit"),
+    data = Natsal2)
+```
+
+
+```{r tornado plots, eval=showplot}
+lattice::dotplot(ranef(fit, condVar = TRUE),
+                 scales = list(cex = 0.5))
+```
+
+```{r fix effect odds-ratios}
+# http://www.ats.ucla.edu/stat/r/dae/melogit.htm
+
+exp(coef(fit)$laname["YORK", ])
+# exp(confint(fit))
+
+se <- sqrt(diag(vcov(fit)))
+
+# table of estimates with 95% CI
+tab <- cbind(Est = fixef(fit),
+             LL = fixef(fit) - 1.96 * se,
+             UL = fixef(fit) + 1.96 * se)
+tab
+exp(tab)
+```
+
+
+```{r survey-package, eval=FALSE}
+##TODO:
+library(survey)
+
+natsal3 <- svydesign(id = ~ 1,
+                     weights = ~ total_wt,
+                     strata = ~ strata,
+                     data = Natsal0,
+                     nest = TRUE)
+
+svyglm(cttestly ~ dage + rsex + ethnic2 + student + `Numerical classification`,
+       family = quasibinomial,
+       design = natsal3)
+```
+
+```{r main-model-additive, eval=FALSE}
+# file:///C:/Users/nathan.green.PHE/Downloads/Fitting_Additive_Binomial_Regression_Models_with_the_R_Package_blm.pdf
+## is it that we can't have random effects in this model??
+
+library(blm)
+
+## >28 is 75% quantile
+fit.blm <- blm(formula = cttestly ~ 1 + student + sex*age + laname,# + ethnic2
+               weights = Natsal2$total_wt.int,
+               data = Natsal2)
+                    # data = Natsal)
+coef(fit.blm)
+```
+
+```{r general additive model, eval=FALSE}
+##TODO##
+## how do I do this with categorical data??
+library(gam)
+
+# http://web.stanford.edu/~hastie/Papers/gam.pdf
+fit.gam <- gam(cttestly ~ s(student) + s(sex) + s(age),
+               data = Natsal2)
+```
+
+```{r residual_plot, eval=showplot}
+predicted <- predict(fit, Natsal2[,c("student","sex","age","ethnic2","laname","gor","sin2")]) > 0.5
+
+plot(predicted - Natsal2$cttestly)
+
+table(predicted, Natsal2$cttestly)
+```
+
+
+### Missing LA Random Effects and Neighbour Smoothing
+
+Because some of the LAs don't have any sample point we create a vector of LA random effects that includes these.
+We set the RE to 0.
+
+
+```{r missing_LA eval=TRUE}
+## add some missing random effects
+missingLANatsal.names <- unique(Natsal0$laname)[!unique(Natsal0$laname) %in% rownames(ranef(fit)$laname)]
+missingLAsim_prop.names <- unique(sim_prop_la$LAname)[!unique(sim_prop_la$LAname) %in% rownames(ranef(fit)$laname)]
+missingLA.names <- union(missingLAsim_prop.names, missingLANatsal.names)
+
+la.ranefs <- array(0, dim = c(length(missingLA.names), 1))
+dimnames(la.ranefs) <- list(missingLA.names, "(Intercept)")
+la.ranefs <- rbind(ranef(fit)$laname, la.ranefs)
+```
+
+```{r missing_metUA eval=TRUE}
+## add some missing random effects
+missingmetUANatsal.names <- unique(Natsal0$metcounty_UA)[!unique(Natsal0$metcounty_UA) %in% rownames(ranef(fit)$metcounty_UA)]
+missingmetUAsim_prop.names <- unique(sim_prop_la$metcounty_UA)[!unique(sim_prop_la$metcounty_UA) %in% rownames(ranef(fit)$metcounty_UA)]
+missingmetUA.names <- na.omit(union(missingmetUAsim_prop.names, missingmetUANatsal.names))
+
+metUA.ranefs <- array(0, dim = c(length(missingmetUA.names), 1))
+dimnames(metUA.ranefs) <- list(missingmetUA.names, "(Intercept)")
+metUA.ranefs <- rbind(ranef(fit)$metcounty_UA, metUA.ranefs)
+```
+
+```{r missing_gor eval=FALSE}
+##TODO##
+## add some missing random effects
+missinggorNatsal.names <- unique(Natsal0$gor)[!unique(Natsal0$gor) %in% rownames(ranef(fit)$gor)]
+missinggorsim_prop.names <- unique(sim_prop_la$gor)[!unique(sim_prop_la$gor) %in% rownames(ranef(fit)$gor)]
+missinggor.names <- union(missinggorsim_prop.names, missinggorNatsal.names)
+
+gor.ranefs <- array(0, dim = c(length(missinggor.names), 1))
+dimnames(gor.ranefs) <- list(missinggor.names, "(Intercept)")
+gor.ranefs <- rbind(ranef(fit)$gor, gor.ranefs)
+```
+
+Alternatively, we can take averages of the neighbouring LAs.
+We can just do this for missing LA random effects or we can do this will all of the random effects.
+This may help to account for the test lab mis-specification by postcode and the movement of people to test somewhere other than where they live.
+
+
+```{r smoothed-missing-LAs-ranef, eval=TRUE}
+## fitted LAs
+LAnames <- rownames(ranef(fit)$laname)
+numNeighbours <- rowSums(madjacency[ ,-1])
+colnames(madjacency) <- STIecoPredict::LAnameClean(colnames(madjacency))
+
+madjacencyRE <- madjacency
+
+for (i in LAnames) {
+    madjacencyRE[, i] <- madjacencyRE[, i]*ranef(fit)$laname[i, ]
+}
+
+madjacencyRE[madjacencyRE == 1] <- 0
+
+rowAverages <- array(rowSums(madjacencyRE[ ,-1])/numNeighbours, dim = c(length(numNeighbours), 1))
+rowAverages[is.nan(rowAverages)] <- 0
+dimnames(rowAverages) <- list(madjacencyRE[ ,1], "(Intercept)")
+
+missingLANatsal.names <- unique(Natsal0$laname)[!unique(Natsal0$laname) %in% rownames(ranef(fit)$laname)]
+missingLAsim_prop.names <- unique(sim_prop_la$LAname)[!unique(sim_prop_la$LAname) %in% rownames(ranef(fit)$laname)]
+missingLA.names <- union(missingLAsim_prop.names, missingLANatsal.names)
+
+la.ranefs <- subset(rowAverages, rownames(rowAverages) %in% missingLA.names)
+la.ranefs <- rbind(ranef(fit)$laname, la.ranefs)
+```
+
+```{r smoothed--all--LAs-ranef, eval=FALSE}
+## takes mean average of each LA and its neighbours
+
+names(madjacency) <- LAnameClean(names(madjacency))
+madjacency[ ,1] <- LAnameClean(madjacency[, 1])
+
+## fitted LAs
+LAnames <- rownames(ranef(fit.cttestly)$laname)
+
+madjacencyRE <- madjacency
+
+# madjacencyRE <- madjacencyRE[, c(TRUE,(names(madjacency)%in%LAnames)[-1])]  #not missing LAs
+# madjacencyRE <- madjacencyRE[(names(madjacency)%in%LAnames)[-1],]
+
+for (i in 1:nrow(madjacencyRE)) madjacencyRE[i, i + 1] <- 1   #diagonal (not including first column)
+
+# numNeighbours <- rowSums(madjacencyRE[, -1])  #true number of neigbours
+
+## fillin fitted random effects
+for (i in LAnames){
+    madjacencyRE[, i] <- madjacencyRE[, i] * ranef(fit)$laname[i, ]
+}
+
+madjacencyRE[madjacencyRE == 1] <- 0    #if don't have fitted RE then remove from average
+
+## number of neighbours with values
+numNeighbours <- apply(madjacencyRE[ ,-1], 1, function(x) sum(x != 0)) #numNeighbours <- rowSums(madjacencyRE[, -1])
+
+rowAverages <- array(rowSums(madjacencyRE[ ,-1])/numNeighbours, dim = c(length(numNeighbours),1))
+rowAverages[is.nan(rowAverages)] <- 0
+dimnames(rowAverages) <- list(madjacencyRE[ ,1], "(Intercept)")
+
+## who is still without an estimate?
+missingLANatsal.names <- unique(Natsal0$laname)[!unique(Natsal0$laname) %in% rownames(rowAverages)]
+missingLAsim_prop.names <- unique(sim_prop_la$LAname)[!unique(sim_prop_la$LAname) %in% rownames(rowAverages)]
+missingLA.names <- union(missingLAsim_prop.names, missingLANatsal.names)
+
+la.ranefs <- array(0, dim = c(length(missingLA.names), 1))
+dimnames(la.ranefs) <- list(missingLA.names, "(Intercept)")
+la.ranefs <- rbind(rowAverages, la.ranefs)
+```
+
+
+
+## Try different ethnic group probabilities
+
+```{r try-different-pethnic2, eval=FALSE}
+# LA_ethnic2 <- melt(LA_ethnic2, id.vars = "LA Name", variable.name = "ethnic2")
+# LA_ethnic2$`LA Name` <- LAnameClean(LA_ethnic2$`LA Name`)
+# LA_ethnic2$`LA Name` <- toupper(LA_ethnic2$`LA Name`)
+# LA_ethnic2$ethnic2 <- toupper(LA_ethnic2$ethnic2)
+# LA_ethnic2$value <- LA_ethnic2$value/100
+# names(LA_ethnic2)[names(LA_ethnic2)=="value"] <- "p.ethnic2"
+
+#ONS via guardian website
+LA_ethnic2 = get("LA_ethnic2", asNamespace('STIecoPredict'))
+
+sim_prop_la <- sim_prop_la[ ,names(sim_prop_la) != "p.ethnic2"]
+sim_prop_la <- merge(sim_prop_la, LA_ethnic2, by = c("LAname", "ethnic2"), all.x=TRUE)
+```
+
+
+### This are the main MRP steps
+
+# Append predictions to joint distribution dataset
+
+```{r classif_probs}
+fixeff.formula <- as.formula("cttestly ~ student + sex + age + ethnic2 + livealone")
+
+## census data
+# test.calcTotalProbs(sim_prop_la)
+sim_prop_la.fit <- STIecoPredict:::calcTotalProbs(formula = fixeff.formula,
+                                                  data = sim_prop_la,
+                                                  extracols = c("LAname","gor","Average Score","metcounty_UA","Numerical classification","Conception.deciles"))
+
+pred <- arm::invlogit(
+                    fixef(fit)["(Intercept)"] +
+                     
+                    fixef(fit)["sexWomen"]*(sim_prop_la.fit$sex == "Women") +
+                 
+                    fixef(fit)["studentTRUE"]*(sim_prop_la.fit$student) +
+                        
+                    fixef(fit)["I(hhsize == 1)TRUE"]*(sim_prop_la.fit$livealone) +
+                 
+                    ranef(fit)$ethnic2[as.character(sim_prop_la.fit$ethnic2), 1] +
+
+                    ##ranef(fit)$age[as.character(sim_prop_la.fit$age),1] +
+                      
+                    ranef(fit)$'sex.age'[paste(sim_prop_la.fit$sex, sim_prop_la.fit$age, sep = "."), 1] +
+                        
+                    ## ranef(fit)$laname[as.character(sim_prop_la.fit$LAname),1] +
+                    la.ranefs[as.character(sim_prop_la.fit$LAname), 1] +
+                        
+                    ranef(fit)$gor[as.character(sim_prop_la.fit$gor), 1] +
+                    ## fixef(fit)["I(gor == 9)TRUE"]*(sim_prop_la.fit$gor == 9)    #london
+                        
+                    ## ranef(fit)$metcounty_UA[as.character(sim_prop_la.fit$metcounty_UA), 1] #+
+                    metUA.ranefs[as.character(sim_prop_la.fit$metcounty_UA), 1] +
+                    
+                    fixef(fit)["I(`Average Score` > 28)TRUE"]*(sim_prop_la.fit$`Average Score` > 28) +
+                      
+                    ranef(fit)$`Numerical classification`[as.character(sim_prop_la.fit$`Numerical classification`), 1] +
+                        
+                    ranef(fit)$Conception.decile[as.character(sim_prop_la.fit$Conception.deciles), 1]
+)
+```
+
+```{r weight_and_sum}
+## weight the probabilities by the subpopulation sizes and then sum by LA
+
+predweighted <- pred * sim_prop_la.fit$totalprob
+
+LApred <- tapply(predweighted, sim_prop_la.fit$LAname, sum)
+```
+
+The LA specific post-stratified estimates are then
+
+```{r LA_predictions}
+LApred <- data.frame(LApred = LApred[order(LApred)])
+```
+
+
+## Re-adjust for conditioning of ages between 16-24 only
+
+What am I doing here??...
+
+```{r LApred.adj}
+# popCensus <- read.csv("..\\..\\packages\\STIecoPredict\\raw-data\\popCensus.csv")
+
+LApred$LAname <- rownames(LApred)
+popCensus$LAname <- STIecoPredict:::LAnameClean(popCensus$LAname)
+
+rownames(LApred) <- NULL
+
+LApred <- merge(LApred, popCensus[popCensus$Sex == "All", c("LAname","prob.25.and.over")],
+                all.x = TRUE)
+
+LApred$LApred.adj <- LApred$LApred*(1 - LApred$prob.25.and.over)
+
+LApred[order(LApred$LApred.adj), ]
+```
+
+
+```{r, eval=savedata}
+save(pred, LApred, file = "data/predictions.RData")
+```
+
+
+Calculate the output values using the raw data.
+
+```{r direct_estimates_la}
+## raw
+NatsalLA <- melt(tapply(Natsal2$cttestly, Natsal2$laname, mean),
+                 varnames = c("LA.Name")) #direct estimate
+
+NatsalLAsize <- melt(tapply(Natsal2$cttestly, Natsal2$laname, length),
+                     varnames = c("LA.Name"))
+#as.NatsalLAsize <- data.frame(table(Natsal2$laname))
+
+## with sample weights
+NatsalLA.weights <- ddply(.data = Natsal2,
+                          .variables = .(laname),
+                          function(y) data.frame(wtmean = weighted.mean(x = y$cttestly,
+                                                                        w = y$total_wt)))
+
+## use predictions instead of data
+##TODO##
+Natsal2$cttestly.predict <- predict(fit, type = "response")
+NatsalLA.predict <- melt(tapply(Natsal2$cttestly.predict,
+                                Natsal2$laname, mean),
+                         varnames = c("LA.Name")) #direct estimate
+NatsalLA.weights.predict <- ddply(.data = Natsal2,
+                                  .variables = .(laname),
+                                  function(y) data.frame(wtmean = weighted.mean(x = y$cttestly.predict,
+                                                                                w = y$total_wt)))
+```
+
+
+## Surveillance data
+
+Combine predictions with the surveillance data and produce summary statistics for each area.
+
+```{r all_joined_output}
+CTADGUM_pred <- STIecoPredict:::joinAllOutcomeData(LApred, adj = 0.945)
+
+CTADGUM_pred <- STIecoPredict:::calcStats.CTADGUM_pred(CTADGUM_pred)
+```
+
+```{r Natsal_surveillance_joins}
+CTADGUM_pred <- merge(CTADGUM_pred, NatsalLA[ ,c("LA.Name", "value")],
+                      by.x = "LA Name", by.y = "LA.Name", all.x = TRUE)
+
+CTADGUM_pred <- merge(CTADGUM_pred, NatsalLA.weights[ ,c("laname", "wtmean")],
+                      by.x = "LA Name", by.y = "laname", all.x = TRUE)
+
+CTADGUM_pred <- merge(CTADGUM_pred, NatsalLAsize[ ,c("LA.Name", "value")],
+                      by.x = "LA Name", by.y = "LA.Name", all.x = TRUE)
+
+names(CTADGUM_pred)[names(CTADGUM_pred) %in% c("value.x", "value.y")] <- c("NatsalLA", "NatsalLAsize")
+
+CTADGUM_pred$NatsalLAsize[is.na(CTADGUM_pred$NatsalLAsize)] <- 1.5  #missing LAs
+
+CTADGUM_pred$`LA Name` <- as.factor(CTADGUM_pred$`LA Name`)
+CTADGUM_pred$laname.num <- as.numeric(CTADGUM_pred$`LA Name`)
+
+CTADGUM_pred$Region <- droplevels(CTADGUM_pred$Region)
+CTADGUM_pred <- CTADGUM_pred[order(CTADGUM_pred$Region), ]
+
+x <- by(CTADGUM_pred, CTADGUM_pred$Region, nrow)
+
+CTADGUM_pred$LAnum_inregion <- unlist(sapply(x, function(z) z:1))
+```
+
+
+```{r eval=savedata}
+save(CTADGUM_pred, file = "data/CTADGUM_pred-with-LA.RData")
+```
+
+
+### Include uncertainty on ethnicity probabilities
+##TODO## ??
+
+```{r eval=FALSE}
+
+library(gtools)
+
+temp <- dcast(data = sim_prop_la,
+              formula = LAname + age + sex + smokenow + increasingdrinker + student ~ ethnic2,
+              value.var = "p.ethnic2")
+
+temp2 <- t(round(apply(temp[ ,7:12]*10, 1,
+                       function(x) rdirichlet(n = 1, alpha = x)), 5))
+
+apply(temp2, 2, median)
+colnames(temp2) <- names(temp[ ,7:12])
+mtemp <- data.frame(temp[ ,-(7:12)], temp2)
+sample.ethnic2 <- melt(data = mtemp,
+                       measure.vars = make.names(names(temp[ ,7:12])),
+                       variable.name = "ethnic2")
+
+```
+
+

@@ -8,7 +8,10 @@
 #' @param drink0 Intervention hypothetical impact of no alcohol drinking
 #'
 #' @return list
-
+#' @export
+#'
+#' @examples
+#'
 classPredict <- function(fit.model, drink0=FALSE){
 
   require(plyr, quietly = TRUE)

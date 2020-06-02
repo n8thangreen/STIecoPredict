@@ -1,0 +1,31 @@
+display(log)
+check(C:/Users/ngreen1/Dropbox/small-area & chlamydia/R_code/packages/STIecoPredict/model.txt)
+model is syntactically correct
+data(C:/Users/ngreen1/Dropbox/small-area & chlamydia/R_code/packages/STIecoPredict/data.txt)
+data loaded
+compile(3)
+model compiled
+inits(1,C:/Users/ngreen1/Dropbox/small-area & chlamydia/R_code/packages/STIecoPredict/inits1.txt)
+this chain contains uninitialized variables
+inits(2,C:/Users/ngreen1/Dropbox/small-area & chlamydia/R_code/packages/STIecoPredict/inits2.txt)
+this chain contains uninitialized variables
+inits(3,C:/Users/ngreen1/Dropbox/small-area & chlamydia/R_code/packages/STIecoPredict/inits3.txt)
+this chain contains uninitialized variables
+gen.inits()
+initial values generated, model initialized
+thin.updater(25)
+update(1)
+set(sd)
+update(4000)
+coda(*,C:/Users/ngreen1/Dropbox/small-area & chlamydia/R_code/packages/STIecoPredict/coda)
+stats(*)
+
+Node statistics
+	 node	 mean	 sd	 MC error	2.5%	median	97.5%	start	sample
+	sd	4.994	2.861	0.02565	0.278	4.981	9.739	2	12000
+history(*,C:/Users/ngreen1/Dropbox/small-area & chlamydia/R_code/packages/STIecoPredict/history.odc)
+
+History
+
+save(C:/Users/ngreen1/Dropbox/small-area & chlamydia/R_code/packages/STIecoPredict/log.odc)
+save(C:/Users/ngreen1/Dropbox/small-area & chlamydia/R_code/packages/STIecoPredict/log.txt)

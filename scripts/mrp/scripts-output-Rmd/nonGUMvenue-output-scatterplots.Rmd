@@ -1,0 +1,112 @@
+---
+title: "GUMvenue output plots for Natsal-mrp analysis"
+author: "Nathan Green"
+date: "5 May 2016"
+output: word_document
+---
+
+
+```{r eval=FALSE}
+load(file="data/CTADGUM_pred-with-LA.RData")
+# load(file="data/CTADGUM_pred-no-place-effects.RData")
+```
+
+```{r}
+SCALE <- 10
+```
+
+
+```{r calc-GUM-surveillance-coverage}
+CTADGUM_age1524_2012$LA.Name <- toupper(CTADGUM_age1524_2012$LA.Name)
+CTADGUM_age1524_2012$Coverage2012.nongum <- with(CTADGUM_age1524_2012, Chlamydia.Tests.nongum/X15.24.Year.Old.Population.Estimates)
+CTADGUM_age1524_2012$Coverage2012.nongum <- CTADGUM_age1524_2012$Coverage2012.nongum*(1-0.0767)   #remove proportion estimated to be 15 year olds
+CTADGUM_pred <- merge(CTADGUM_pred, CTADGUM_age1524_2012[ ,c("LA.Name", "Coverage2012.nongum")], by.x="LA Name", by.y="LA.Name")
+
+CTADGUM_age1524_2013$LA.Name <- toupper(CTADGUM_age1524_2013$LA.Name)
+CTADGUM_age1524_2013$Coverage2013.nongum <- with(CTADGUM_age1524_2013, Chlamydia.Tests.nongum/X15.24.Year.Old.Population.Estimates)
+CTADGUM_age1524_2013$Coverage2013.nongum <- CTADGUM_age1524_2013$Coverage2013.nongum*(1-0.0767)   #remove proportion estimated to be 15 year olds
+CTADGUM_pred <- merge(CTADGUM_pred, CTADGUM_age1524_2013[ ,c("LA.Name", "Coverage2013.nongum")], by.x="LA Name", by.y="LA.Name")
+```
+
+
+
+```{r direct_pred_scatterplot}
+plot(CTADGUM_pred$nonGUMwtmean, CTADGUM_pred$LApred,
+     xlim=c(0,0.7), ylim=c(0,0.7),
+     cex=CTADGUM_pred$NatsalLAsize/SCALE, main="(b)",
+     xlab="Direct LA estimates using Natsal-3", ylab="MRP estimates")
+abline(a=0, b=1)
+```
+
+```{r pred_surveill_scatterplot_2012}
+par(mfrow=c(1,1))
+plot(CTADGUM_pred$LApred, CTADGUM_pred$Coverage2012.nongum,
+     cex=CTADGUM_pred$NatsalLAsize/SCALE,
+          xlab="MRP estimates", ylab="Surveillance data",
+     # col=1+as.numeric(CTADGUM_pred$NatsalLAsize!=1.5),
+     xlim=c(0,0.7), ylim=c(0,0.7))
+abline(a=0, b=1, lty=2, lwd=2)
+abline(a=mean.surveil-mean.Natsal, b=1, lty=3, lwd=2)
+abline(h=mean.Natsal, lty=2)
+abline(h=mean.surveil, lty=3)
+text(x = c(0.25, 0.5, 0.25, 0.45), y = c(0.2, 0.3, 0.34, 0.4), labels = c("A","B","C","D"), cex=1.8)
+
+
+par(mfrow=c(1,1))
+plot(CTADGUM_pred$LApred, CTADGUM_pred$Coverage2012.nongum,
+          xlab="MRP estimates", ylab="Surveillance data",
+          cex=CTADGUM_pred$NatsalLAsize/SCALE,
+     col=rgb(0, 0, 0, 0.3), pch=16,
+     # col=1+as.numeric(CTADGUM_pred$NatsalLAsize!=1.5),
+     xlim=c(0,0.7), ylim=c(0,0.7))
+abline(a=0, b=1)
+
+par(mfrow=c(1,1))
+plot(CTADGUM_pred$LApred, CTADGUM_pred$Coverage2012.nongum,
+          xlab="MRP estimates", ylab="Surveillance data",
+     col=rgb(0, 0, 0, 0.3), pch=16,
+     # col=1+as.numeric(CTADGUM_pred$NatsalLAsize!=1.5),
+     xlim=c(0,0.7), ylim=c(0,0.7))
+abline(a=0, b=1, lty=2, lwd=2)
+abline(a=mean.surveil-mean.Natsal, b=1, lty=3, lwd=2)
+abline(h=mean.Natsal, lty=2)
+abline(h=mean.surveil, lty=3)
+text(x = c(0.25, 0.5, 0.25, 0.45), y = c(0.2, 0.3, 0.34, 0.4), labels = c("A","B","C","D"))
+```
+
+```{r pred_surveill_scatterplot_2013}
+par(mfrow=c(1,1))
+plot(CTADGUM_pred$LApred, CTADGUM_pred$Coverage2013.nongum,
+     cex=CTADGUM_pred$NatsalLAsize/SCALE,
+          xlab="MRP estimates", ylab="Surveillance data",
+     # col=1+as.numeric(CTADGUM_pred$NatsalLAsize!=1.5),
+     xlim=c(0,0.7), ylim=c(0,0.7))
+abline(a=0, b=1, lty=2, lwd=2)
+abline(a=mean.surveil-mean.Natsal, b=1, lty=3, lwd=2)
+abline(h=mean.Natsal, lty=2)
+abline(h=mean.surveil, lty=3)
+text(x = c(0.25, 0.5, 0.25, 0.45), y = c(0.2, 0.3, 0.34, 0.4), labels = c("A","B","C","D"), cex=1.8)
+
+
+par(mfrow=c(1,1))
+plot(CTADGUM_pred$LApred, CTADGUM_pred$Coverage2013.nongum,
+          xlab="MRP estimates", ylab="Surveillance data",
+          cex=CTADGUM_pred$NatsalLAsize/SCALE,
+     col=rgb(0, 0, 0, 0.3), pch=16,
+     # col=1+as.numeric(CTADGUM_pred$NatsalLAsize!=1.5),
+     xlim=c(0,0.7), ylim=c(0,0.7))
+abline(a=0, b=1)
+
+par(mfrow=c(1,1))
+plot(CTADGUM_pred$LApred, CTADGUM_pred$Coverage2013.nongum,
+          xlab="MRP estimates", ylab="Surveillance data",
+     col=rgb(0, 0, 0, 0.3), pch=16,
+     # col=1+as.numeric(CTADGUM_pred$NatsalLAsize!=1.5),
+     xlim=c(0,0.7), ylim=c(0,0.7))
+abline(a=0, b=1, lty=2, lwd=2)
+abline(a=mean.surveil-mean.Natsal, b=1, lty=3, lwd=2)
+abline(h=mean.Natsal, lty=2)
+abline(h=mean.surveil, lty=3)
+text(x = c(0.25, 0.5, 0.25, 0.45), y = c(0.2, 0.3, 0.34, 0.4), labels = c("A","B","C","D"))
+```
+

@@ -1,0 +1,347 @@
+---
+title: MRP script of LA-level chlaymdia coverage analysis- WinBUGS input
+author: N Green
+date: 13-05-2016
+output: word_document
+---
+
+
+```{r preamble}
+library(lme4)
+library(car)
+library(arm)
+library(pander)
+library(knitr)
+library(stargazer)
+library(xtable)
+library(lattice)
+library(plyr)
+library(STIecoPredict)
+library(R2WinBUGS)
+library(coda)
+library(reshape2)
+library(modeest)
+```
+
+```{r load_data}
+# load("C:/Users/ngreen1/Dropbox/small-area & chlamydia/R_code/scripts/mrp/data/cleaned-regn-input-mrpNatsal.RData")
+load("./data/cleaned-regn-input-mrpNatsal.RData")
+load("./data/outmat.RData")
+```
+
+
+```{r}
+Natsal0 <- Natsal
+savedata <- FALSE
+
+outmat <- outmat[sample(x=1:nrow(outmat), size = 500), ] #otherwise too big for memory
+nsample <- nrow(outmat)
+```
+
+```{r Natsal-subsets}
+Natsal  <- subset(Natsal, age>=15 & age<25)   #NCSP range
+Natsal  <- subset(Natsal, sam1yr==0) # opposite sex partner in last year only
+Natsal$sex1yr <- (Natsal$het1yr!=0 | Natsal$sam1yr!=0)
+
+# names.atleast1test <- rownames(table(Natsal$laname, Natsal$cttestly))[table(Natsal$laname, Natsal$cttestly)[,"1"]>0]
+# names.LAbigenough <- names(table(Natsal$laname)[(table(Natsal$laname))>10])
+# 
+# subnames <- names.LAbigenough[names.LAbigenough%in%names.atleast1test]
+# Natsal2  <- subset(Natsal, laname%in%subnames)
+Natsal2 <- Natsal
+```
+
+```{r mode-functions}
+Mode <- function(x) {
+  ux <- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+}
+```
+
+```{r posterior-summary}
+posterior.summary <- as.data.frame(t(apply(outmat, 2, quantile, probs=c(0.025,0.25,0.5,0.75,0.975) )))
+posterior.summary$variable <- rownames(posterior.summary)
+posterior.summary$mode <- apply(outmat, 2, function(x) mlv(x, method = "mfv")[["M"]]) #Mode)
+# posterior.summary <- posterior.summary[posterior.summary$variable!="deviance",]
+
+posterior.means <- apply(outmat, 2, mean)
+names(posterior.means) <- toupper(names(outmat))
+```
+
+
+Because some of the LAs don't have any sample point we create a vector of LA random effects that includes these. We set these REs to 0.
+Could alternatively take e.g. average of neighbours instead.
+
+```{r fillin_missingLAs}
+missingLAnames <- names(posterior.means)[!levels(sim_prop_la$LAname)%in%names(posterior.means)]
+missingLAs <- rep(0, length(missingLAnames))
+names(missingLAs) <- missingLAnames
+
+#ad-hoc!
+# posterior.means <- c(posterior.means,
+#                      c("CHRISTCHURCH"=0, "MALDON"=0, "ROCHFORD"=0, "UTTLESFORD"=0, "WATFORD"=0, "RIBBLE VALLEY"=0, "RICHMONDSHIRE"=0, "CHERWELL"=0, "NORTH WARWICKSHIRE"=0))
+
+posterior.means <- c(posterior.means, missingLAs)
+```
+
+```{r}
+posterior.means <- c(posterior.means, `15`=as.numeric(posterior.means["16"]))
+```
+
+```{r post-stratification-setup}
+sim_prop_la$london <- sim_prop_la$gor==9
+
+##TODO## this needs to go in the prep file
+sim_prop_la <- merge(sim_prop_la, LAclassification.dat[,c("LA Name", "Classification")], by.x = "LAname", by.y = "LA Name", all.x = TRUE)
+# sim_prop_la <- merge(sim_prop_la, laregionlookup2013[,c("la_name","region_name")], by.x="LAname", by.y="la_name", all.x=TRUE)
+
+fixeff.formula <- as.formula("cttestly ~ student + sex + age + ethnic2") #+ livealone
+
+## census data
+# test.calcTotalProbs(sim_prop_la)
+sim_prop_la.fit <- STIecoPredict:::calcTotalProbs(formula=fixeff.formula, data=sim_prop_la,
+                                    extracols = c("LAname", "gor", "region_name", "Average Score", "metcounty_UA", "Numerical classification", "Classification", "Conception.deciles"))
+```
+
+
+--------------------------------------------------
+
+
+```{r posterior-means-mrp}
+pred <- arm::invlogit(
+                    posterior.means["ALPHA"] +
+                     
+                    posterior.means["B.MALE"]*(sim_prop_la.fit$sex=="Men") +
+                 
+                    posterior.means["B.STUDENT"]*(sim_prop_la.fit$student) +
+                 
+                    posterior.means["B.IMD"]*(sim_prop_la.fit$`Average Score`>28) +
+                        
+                    # posterior.means["B.livealone"]*(sim_prop_la.fit$livealone) +      ##TODO## rerun WinBUGS with this variable included
+                    
+                    posterior.means[as.character(sim_prop_la.fit$ethnic2)] +
+
+                    posterior.means[as.character(sim_prop_la.fit$age)] +
+                      
+                    posterior.means[as.character(sim_prop_la.fit$LAname)] +
+                    # posterior.means["B.LONDON"]*(sim_prop_la$london) +
+                   
+                    posterior.means[paste("MET.", as.character(sim_prop_la.fit$metcounty_UA), sep="")] +
+                   
+                    posterior.means[as.character(sim_prop_la.fit$region_name)] +
+                   
+                    posterior.means[as.character(sim_prop_la.fit$Conception.deciles)] +
+                   
+                    posterior.means[as.character(sim_prop_la.fit$Classification)] +
+                      
+                    posterior.means[paste("CAR.", as.character(sim_prop_la.fit$LAname), sep="")]
+                   )
+```
+
+```{r weight_and_sum}
+## weight the probabilities by the subpopulation sizes and then sum by LA
+
+predweighted <- pred * sim_prop_la.fit$totalprob
+LApred <- tapply(predweighted, sim_prop_la.fit$LAname, sum, na.rm=TRUE)
+```
+
+The LA specific post-stratified estimates are then
+
+```{r LA_predictions}
+(LApred <- data.frame(LApred=LApred[order(LApred)]))
+```
+
+
+```{r, eval=savedata}
+save(pred, LApred, file="data/predictions.RData")
+```
+
+
+## Surveillance data
+
+Combine predictions with the surveillance data and produce summary statistics for each area.
+Use CTAD, GUMCAD and NCSP from various years.
+
+```{r all_joined_output}
+CTADGUM_pred <- joinAllOutcomeData(pred=LApred)
+CTADGUM_pred <- STIecoPredict:::calcStats.CTADGUM_pred(CTADGUM_pred)
+```
+
+```{r eval=savedata}
+save(CTADGUM_pred, file="data/CTADGUM_pred.RData")
+```
+
+```{r direct_estimates_la}
+agerange <- 15:24
+NatsalLA <- melt(tapply(Natsal$cttestly[Natsal$age%in%agerange], Natsal$laname[Natsal$age%in%agerange], mean), varnames = c("LA Name"))
+NatsalLAsize <- melt(tapply(Natsal$cttestly[Natsal$age%in%agerange], Natsal$laname[Natsal$age%in%agerange], length), varnames = c("LA Name"))
+CTADGUM_pred <- merge(CTADGUM_pred, NatsalLA[,c("LA Name", "value")], by="LA Name", all.x=TRUE)
+CTADGUM_pred <- merge(CTADGUM_pred, NatsalLAsize[,c("LA Name", "value")], by="LA Name", all.x=TRUE)
+names(CTADGUM_pred)[names(CTADGUM_pred)%in%c("value.x", "value.y")] <- c("NatsalLA", "NatsalLAsize")
+```
+
+
+---------------------------------------
+
+### Propogate the posterior uncertainty
+
+```{r fillin_missingLAs, eval=FALSE}
+missingLAs <- as.data.frame(matrix(0, nrow = nsample, ncol = length(missingLAnames)))
+names(missingLAs) <- missingLAnames
+outmat <- cbind(outmat, missingLAs)
+
+##TODO##
+## debug: go back and find where missing...
+outmat <- data.frame(outmat,
+                     cbind("CANNOCK CHASE"=rep(0,nsample), "EDEN"=rep(0,nsample), "GLOUCESTER"=rep(0,nsample), "MALVERN HILLS"=rep(0,nsample), "PENDLE"=rep(0,nsample), "PRESTON"=rep(0,nsample), "PURBECK"=rep(0,nsample), "WEYMOUTH AND PORTLAND"=rep(0,nsample), "CHRISTCHURCH"=rep(0,nsample), "MALDON"=rep(0,nsample), "ROCHFORD"=rep(0,nsample), "UTTLESFORD"=rep(0,nsample), "WATFORD"=rep(0,nsample), "RIBBLE VALLEY"=rep(0,nsample), "RICHMONDSHIRE"=rep(0,nsample), "CHERWELL"=rep(0,nsample), "NORTH WARWICKSHIRE"=rep(0,nsample)), check.names = FALSE)
+```
+
+```{r}
+
+##TODO## the cuts are 0.1 different!!! debug...
+names(outmat)[grepl(pattern = "^\\[", names(outmat))] <- levels(sim_prop_la$Conception.deciles)
+
+##TODO## HACKNEY and CORNWALL missing values...
+sim_prop_la.fit$Conception.deciles[is.na(sim_prop_la.fit$Conception.deciles)] <- "[29.2,33.0)" #fillin missing LAs with median
+```
+
+```{r}
+names(outmat) <- toupper(names(outmat))
+predmat <- matrix(NA, ncol = nsample, nrow = nrow(sim_prop_la.fit))
+```
+
+Basic vector-based approach.
+
+```{r classif_probs_distn-vector, eval=FALSE}
+for (i in 1:nsample){
+  
+predmat[i,] <- arm::invlogit(
+                    outmat[i,"ALPHA"] +
+                     
+                    outmat[i, "B.MALE"]*(sim_prop_la.fit$sex=="Men") +
+                 
+                    outmat[i, "B.STUDENT"]*(sim_prop_la.fit$student) +
+                 
+                    outmat[i, as.character(sim_prop_la.fit$ethnic2)] +
+
+                    outmat[i, as.character(sim_prop_la.fit$age)] +
+                      
+                    outmat[i, as.character(sim_prop_la.fit$LAname)] +
+                    # outmat[i, "B.LONDON"]*(sim_prop_la$london)  +
+                      
+                    outmat[i, as.character(sim_prop_la.fit$metcounty_UA)] +
+                    
+                    outmat[i, as.character(sim_prop_la.fit$gor)] +
+                    
+                    outmat[i, as.character(sim_prop_la.fit$conception)] +
+                    
+                    outmat[i, as.character(sim_prop_la.fit$IMD)] +
+
+                    outmat[i, as.character(sim_prop_la.fit$ONSclass)]
+                   )
+}
+```
+
+
+The above implementation is very slow. The `data.table` package is much faster at this sort of thing.
+
+```{r classif_probs_distn-datatables, eval=TRUE}
+library(data.table)
+
+outmelt <- melt(data.frame(sample=1:nsample, outmat), id.vars="sample")  #long, tidy format
+# outmat <- outmat[,!duplicated(names(outmat))]
+outmelt$variable <- toupper(outmelt$variable)
+
+DT <- data.table(outmelt)
+setkeyv(DT, cols=c("sample","variable"))
+
+#<3 mins
+#covariates x sample
+for (i in 1:nsample){
+  
+predmat[,i] <- arm::invlogit(
+  
+  DT[list(i,"ALPHA")]$value +
+  DT[list(i,"B.MALE")]$value *(sim_prop_la.fit$sex=="Men") +
+  DT[list(i,"B.STUDENT")]$value *(sim_prop_la.fit$student) +
+  DT[list(i,"B.IMD")]$value *(sim_prop_la.fit$`Average Score`>28) +  ##TODO## some average score NAs. why?
+  # DT[list(i,"B.LIVEALONE")]$value *(sim_prop_la.fit$livealone) +    ##TODO## rerun WinBUGS with this variable included
+
+  DT[list(i, make.names(sim_prop_la.fit$ethnic2))]$value +
+  DT[list(i, make.names(sim_prop_la.fit$age))]$value +
+  DT[list(i, make.names(sim_prop_la.fit$LAname))]$value +
+  # DT[list(i,"B.LONDON")]$value *(sim_prop_la.fit$london) +
+  DT[list(i, make.names(paste("MET.",sim_prop_la.fit$metcounty_UA,sep="")))]$value +
+  DT[list(i, make.names(sim_prop_la.fit$region_name))]$value +
+  DT[list(i, make.names(sim_prop_la.fit$Conception.deciles))]$value +  
+  DT[list(i, make.names(sim_prop_la.fit$Classification))]$value +
+  DT[list(i, make.names(paste("CAR.",sim_prop_la.fit$LAname,sep="")))]$value
+  )
+}
+```
+
+```{r eval=savedata}
+#write.csv(predmat, file="data/all_combinations_posterior_sample.csv")
+save(predmat, file="data/all_combinations_posterior_sample.RData")
+```
+
+
+```{r}
+## weight the probabilities by the subpopulation sizes and then sum by LA
+
+predweighted <- sweep(predmat, MARGIN=1, sim_prop_la.fit$totalprob, `*`)
+LApred <- aggregate(predweighted ~ sim_prop_la.fit$LAname, FUN = sum)
+
+LApred$`sim_prop_la.fit$LAname` <- as.character(LApred$`sim_prop_la.fit$LAname`)
+names(LApred)[1] <- "LAname"
+
+# x <- tapply(predweighted, sim_prop_la.fit$LAname, sum)
+
+```
+
+
+```{r direct_estimates_la}
+agerange <- 16:24
+
+## raw
+NatsalLA <- melt(tapply(Natsal$cttestly[Natsal$age%in%agerange], Natsal$laname[Natsal$age%in%agerange], mean), varnames = c("LA.Name")) #direct estimate
+NatsalLAsize <- melt(tapply(Natsal$cttestly[Natsal$age%in%agerange], Natsal$laname[Natsal$age%in%agerange], length), varnames = c("LA.Name"))
+#as.NatsalLAsize <- data.frame(table(Natsal$laname[Natsal$age%in%agerange]))
+
+## with sample weights
+NatsalLA.weights <- ddply(.data=Natsal, .variables=.(laname), function(y) data.frame(wtmean=weighted.mean(x=y$cttestly, w=y$total_wt)))
+```
+
+
+## Surveillance data
+
+
+Combine predictions with the surveillance data and produce summary statistics for each area.
+
+```{r all_joined_output}
+CTADGUM_pred <- STIecoPredict:::joinAllOutcomeData(LApred)
+# CTADGUM_pred <- STIecoPredict:::calcStats.CTADGUM_pred(CTADGUM_pred)
+```
+
+```{r Natsal_surveillance_joins}
+CTADGUM_pred <- merge(CTADGUM_pred, NatsalLA[,c("LA.Name", "value")], by.x = "LA Name", by.y="LA.Name", all.x=TRUE)
+CTADGUM_pred <- merge(CTADGUM_pred, NatsalLA.weights[,c("laname", "wtmean")], by.x = "LA Name", by.y="laname", all.x=TRUE)
+CTADGUM_pred <- merge(CTADGUM_pred, NatsalLAsize[,c("LA.Name", "value")], by.x="LA Name", by.y="LA.Name", all.x=TRUE)
+names(CTADGUM_pred)[names(CTADGUM_pred)%in%c("value.x", "value.y")] <- c("NatsalLA", "NatsalLAsize")
+CTADGUM_pred$NatsalLAsize[is.na(CTADGUM_pred$NatsalLAsize)] <- 1.5  #missing LAs
+
+CTADGUM_pred$`LA Name` <- as.factor(CTADGUM_pred$`LA Name`)
+CTADGUM_pred$laname.num <- as.numeric(CTADGUM_pred$`LA Name`)
+
+## unique id within regions
+CTADGUM_pred$Region <- droplevels(CTADGUM_pred$Region)
+CTADGUM_pred <- CTADGUM_pred[order(CTADGUM_pred$Region), ]
+x <- by(CTADGUM_pred, CTADGUM_pred$Region, nrow)
+CTADGUM_pred$LAnum_inregion <- unlist(sapply(x, function(z) z:1))
+```
+
+```{r eval=savedata}
+save(CTADGUM_pred, file="data/CTADGUM_pred-WinBUGS.RData")
+```
+
+

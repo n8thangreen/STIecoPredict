@@ -1,0 +1,324 @@
+"","Region","LA.Name","LAnum_inregion","laname.num"
+"40","East Midlands","WEST LINDSEY",1,304
+"39","East Midlands","WELLINGBOROUGH",2,298
+"38","East Midlands","SOUTH NORTHAMPTONSHIRE",3,241
+"37","East Midlands","SOUTH KESTEVEN",4,238
+"36","East Midlands","SOUTH HOLLAND",5,237
+"35","East Midlands","SOUTH DERBYSHIRE",6,234
+"34","East Midlands","RUTLAND",7,218
+"33","East Midlands","RUSHCLIFFE",8,216
+"32","East Midlands","OADBY AND WIGSTON",9,191
+"31","East Midlands","NOTTINGHAM",10,189
+"30","East Midlands","NORTHAMPTON",11,186
+"29","East Midlands","NORTH WEST LEICESTERSHIRE",12,185
+"28","East Midlands","NORTH KESTEVEN",13,179
+"27","East Midlands","NORTH EAST DERBYSHIRE",14,176
+"26","East Midlands","NEWARK AND SHERWOOD",15,170
+"25","East Midlands","MELTON",16,160
+"24","East Midlands","MANSFIELD",17,158
+"23","East Midlands","LINCOLN",18,151
+"22","East Midlands","LEICESTER",19,147
+"21","East Midlands","KETTERING",20,138
+"20","East Midlands","HINCKLEY AND BOSWORTH",21,129
+"19","East Midlands","HIGH PEAK",22,127
+"18","East Midlands","HARBOROUGH",23,116
+"17","East Midlands","GEDLING",24,105
+"16","East Midlands","EREWASH",25,97
+"15","East Midlands","EAST NORTHAMPTONSHIRE",26,87
+"14","East Midlands","EAST LINDSEY",27,86
+"13","East Midlands","DERBYSHIRE DALES",28,76
+"12","East Midlands","DERBY",29,75
+"11","East Midlands","DAVENTRY",30,74
+"10","East Midlands","CORBY",31,63
+"9","East Midlands","CHESTERFIELD",32,56
+"8","East Midlands","CHARNWOOD",33,50
+"7","East Midlands","BROXTOWE",34,39
+"6","East Midlands","BOSTON",35,25
+"5","East Midlands","BOLSOVER",36,23
+"4","East Midlands","BLABY",37,20
+"3","East Midlands","BASSETLAW",38,15
+"2","East Midlands","ASHFIELD",39,5
+"1","East Midlands","AMBER VALLEY",40,3
+"87","East of England","WELWYN HATFIELD",1,299
+"86","East of England","WAVENEY",2,295
+"85","East of England","WATFORD",3,294
+"84","East of England","UTTLESFORD",4,286
+"83","East of England","THURROCK",5,279
+"82","East of England","THREE RIVERS",6,278
+"81","East of England","TENDRING",7,274
+"80","East of England","SUFFOLK COASTAL",8,262
+"79","East of England","STEVENAGE",9,256
+"78","East of England","ST. EDMUNDSBURY",10,252
+"77","East of England","ST. ALBANS",11,251
+"76","East of England","SOUTHEND-ON-SEA",12,248
+"75","East of England","SOUTH NORFOLK",13,240
+"74","East of England","SOUTH CAMBRIDGESHIRE",14,233
+"73","East of England","ROCHFORD",15,210
+"72","East of England","PETERBOROUGH",16,195
+"71","East of England","NORWICH",17,188
+"70","East of England","NORTH NORFOLK",18,181
+"69","East of England","NORTH HERTFORDSHIRE",19,178
+"68","East of England","MID SUFFOLK",20,164
+"67","East of England","MALDON",21,155
+"66","East of England","LUTON",22,153
+"65","East of England","KING'S LYNN AND WEST NORFOLK",23,139
+"64","East of England","IPSWICH",24,134
+"63","East of England","HUNTINGDONSHIRE",25,132
+"62","East of England","HERTSMERE",26,126
+"61","East of England","HARLOW",27,118
+"60","East of England","GREAT YARMOUTH",28,109
+"59","East of England","FOREST HEATH",29,101
+"58","East of England","FENLAND",30,100
+"57","East of England","EPPING FOREST",31,95
+"56","East of England","EAST HERTFORDSHIRE",32,85
+"55","East of England","EAST CAMBRIDGESHIRE",33,81
+"54","East of England","DACORUM",34,71
+"53","East of England","COLCHESTER",35,61
+"52","East of England","CHELMSFORD",36,51
+"51","East of England","CENTRAL BEDFORDSHIRE",37,49
+"50","East of England","CASTLE POINT",38,48
+"49","East of England","CAMBRIDGE",39,43
+"48","East of England","BROXBOURNE",40,38
+"47","East of England","BROADLAND",41,35
+"46","East of England","BRENTWOOD",42,32
+"45","East of England","BRECKLAND",43,30
+"44","East of England","BRAINTREE",44,29
+"43","East of England","BEDFORD",45,17
+"42","East of England","BASILDON",46,13
+"41","East of England","BABERGH",47,8
+"119","London","WESTMINSTER",1,307
+"118","London","WANDSWORTH",2,291
+"117","London","WALTHAM FOREST",3,290
+"116","London","TOWER HAMLETS",4,283
+"115","London","SUTTON",5,265
+"114","London","SOUTHWARK",6,249
+"113","London","RICHMOND UPON THAMES",7,207
+"112","London","REDBRIDGE",8,202
+"111","London","NEWHAM",9,173
+"110","London","MERTON",10,162
+"109","London","LEWISHAM",11,149
+"108","London","LAMBETH",12,144
+"107","London","KINGSTON UPON THAMES",13,141
+"106","London","KENSINGTON AND CHELSEA",14,137
+"105","London","ISLINGTON",15,136
+"104","London","HOUNSLOW",16,131
+"103","London","HILLINGDON",17,128
+"102","London","HAVERING",18,125
+"101","London","HARROW",19,120
+"100","London","HARINGEY",20,117
+"99","London","HAMMERSMITH AND FULHAM",21,115
+"98","London","HACKNEY",22,112
+"97","London","GREENWICH",23,110
+"96","London","ENFIELD",24,94
+"95","London","EALING",25,80
+"94","London","CROYDON",26,70
+"93","London","CAMDEN",27,44
+"92","London","BROMLEY",28,36
+"91","London","BRENT",29,31
+"90","London","BEXLEY",30,18
+"89","London","BARNET",31,10
+"88","London","BARKING AND DAGENHAM",32,9
+"131","North East","SUNDERLAND",1,263
+"130","North East","STOCKTON-ON-TEES",2,258
+"129","North East","SOUTH TYNESIDE",3,246
+"128","North East","REDCAR AND CLEVELAND",4,203
+"127","North East","NORTHUMBERLAND",5,187
+"126","North East","NORTH TYNESIDE",6,183
+"125","North East","NEWCASTLE UPON TYNE",7,172
+"124","North East","MIDDLESBROUGH",8,166
+"123","North East","HARTLEPOOL",9,122
+"122","North East","GATESHEAD",10,104
+"121","North East","DARLINGTON",11,72
+"120","North East","COUNTY DURHAM",12,66
+"170","North West","WYRE",1,321
+"169","North West","WIRRAL",2,313
+"168","North West","WIGAN",3,309
+"167","North West","WEST LANCASHIRE",4,303
+"166","North West","WARRINGTON",5,292
+"165","North West","TRAFFORD",6,284
+"164","North West","TAMESIDE",7,268
+"163","North West","STOCKPORT",8,257
+"162","North West","ST. HELENS",9,253
+"161","North West","SOUTH RIBBLE",10,243
+"160","North West","SOUTH LAKELAND",11,239
+"159","North West","SEFTON",12,224
+"158","North West","SALFORD",13,220
+"157","North West","ROSSENDALE",14,211
+"156","North West","ROCHDALE",15,209
+"155","North West","RIBBLE VALLEY",16,206
+"154","North West","PRESTON",17,199
+"153","North West","PENDLE",18,194
+"152","North West","OLDHAM",19,192
+"151","North West","MANCHESTER",20,157
+"150","North West","LIVERPOOL",21,152
+"149","North West","LANCASTER",22,145
+"148","North West","KNOWSLEY",23,143
+"147","North West","HYNDBURN",24,133
+"146","North West","HALTON",25,113
+"145","North West","FYLDE",26,103
+"144","North West","EDEN",27,92
+"143","North West","COPELAND",28,62
+"142","North West","CHORLEY",29,59
+"141","North West","CHESHIRE WEST AND CHESTER",30,55
+"140","North West","CHESHIRE EAST",31,54
+"139","North West","CARLISLE",32,47
+"138","North West","BURY",33,41
+"137","North West","BURNLEY",34,40
+"136","North West","BOLTON",35,24
+"135","North West","BLACKPOOL",36,22
+"134","North West","BLACKBURN WITH DARWEN",37,21
+"133","North West","BARROW-IN-FURNESS",38,12
+"132","North West","ALLERDALE",39,2
+"237","South East","WYCOMBE",1,320
+"236","South East","WORTHING",2,318
+"235","South East","WOKINGHAM",3,315
+"234","South East","WOKING",4,314
+"233","South East","WINDSOR AND MAIDENHEAD",5,312
+"232","South East","WINCHESTER",6,311
+"231","South East","WEST OXFORDSHIRE",7,305
+"230","South East","WEST BERKSHIRE",8,300
+"229","South East","WEALDEN",9,297
+"228","South East","WAVERLEY",10,296
+"227","South East","VALE OF WHITE HORSE",11,287
+"226","South East","TUNBRIDGE WELLS",12,285
+"225","South East","TONBRIDGE AND MALLING",13,280
+"224","South East","THANET",14,277
+"223","South East","TEST VALLEY",15,275
+"222","South East","TANDRIDGE",16,270
+"221","South East","SWALE",17,266
+"220","South East","SURREY HEATH",18,264
+"219","South East","SPELTHORNE",19,250
+"218","South East","SOUTHAMPTON",20,247
+"217","South East","SOUTH OXFORDSHIRE",21,242
+"216","South East","SOUTH BUCKS",22,232
+"215","South East","SLOUGH",23,230
+"214","South East","SHEPWAY",24,228
+"213","South East","SEVENOAKS",25,226
+"212","South East","RUSHMOOR",26,217
+"211","South East","RUNNYMEDE",27,215
+"210","South East","ROTHER",28,212
+"209","South East","REIGATE AND BANSTEAD",29,205
+"208","South East","READING",30,201
+"207","South East","PORTSMOUTH",31,198
+"206","South East","OXFORD",32,193
+"205","South East","NEW FOREST",33,169
+"204","South East","MOLE VALLEY",34,168
+"203","South East","MILTON KEYNES",35,167
+"202","South East","MID SUSSEX",36,165
+"201","South East","MEDWAY",37,159
+"200","South East","MAIDSTONE",38,154
+"199","South East","LEWES",39,148
+"198","South East","ISLE OF WIGHT",40,135
+"197","South East","HORSHAM",41,130
+"196","South East","HAVANT",42,124
+"195","South East","HASTINGS",43,123
+"194","South East","HART",44,121
+"193","South East","GUILDFORD",45,111
+"192","South East","GRAVESHAM",46,108
+"191","South East","GOSPORT",47,107
+"190","South East","FAREHAM",48,99
+"189","South East","EPSOM AND EWELL",49,96
+"188","South East","ELMBRIDGE",50,93
+"187","South East","EASTLEIGH",51,91
+"186","South East","EASTBOURNE",52,90
+"185","South East","EAST HAMPSHIRE",53,84
+"184","South East","DOVER",54,78
+"183","South East","DARTFORD",55,73
+"182","South East","CRAWLEY",56,69
+"181","South East","CHILTERN",57,58
+"180","South East","CHICHESTER",58,57
+"179","South East","CHERWELL",59,53
+"178","South East","CANTERBURY",60,46
+"177","South East","BRIGHTON AND HOVE",61,33
+"176","South East","BRACKNELL FOREST",62,27
+"175","South East","BASINGSTOKE AND DEANE",63,14
+"174","South East","AYLESBURY VALE",64,7
+"173","South East","ASHFORD",65,6
+"172","South East","ARUN",66,4
+"171","South East","ADUR",67,1
+"273","South West","WILTSHIRE",1,310
+"272","South West","WEYMOUTH AND PORTLAND",2,308
+"271","South West","WEST SOMERSET",3,306
+"270","South West","WEST DORSET",4,302
+"269","South West","WEST DEVON",5,301
+"268","South West","TORRIDGE",6,282
+"267","South West","TORBAY",7,281
+"266","South West","TEWKESBURY",8,276
+"265","South West","TEIGNBRIDGE",9,272
+"264","South West","TAUNTON DEANE",10,271
+"263","South West","SWINDON",11,267
+"262","South West","STROUD",12,261
+"261","South West","SOUTH SOMERSET",13,244
+"260","South West","SOUTH HAMS",14,236
+"259","South West","SOUTH GLOUCESTERSHIRE",15,235
+"258","South West","SEDGEMOOR",16,223
+"257","South West","PURBECK",17,200
+"256","South West","POOLE",18,197
+"255","South West","PLYMOUTH",19,196
+"254","South West","NORTH SOMERSET",20,182
+"253","South West","NORTH DORSET",21,175
+"252","South West","NORTH DEVON",22,174
+"251","South West","MID DEVON",23,163
+"250","South West","MENDIP",24,161
+"249","South West","GLOUCESTER",25,106
+"248","South West","FOREST OF DEAN",26,102
+"247","South West","EXETER",27,98
+"246","South West","EAST DORSET",28,83
+"245","South West","EAST DEVON",29,82
+"244","South West","COTSWOLD",30,65
+"243","South West","CORNWALL",31,64
+"242","South West","CHRISTCHURCH",32,60
+"241","South West","CHELTENHAM",33,52
+"240","South West","BRISTOL, CITY OF",34,34
+"239","South West","BOURNEMOUTH",35,26
+"238","South West","BATH AND NORTH EAST SOMERSET",36,16
+"302","West Midlands","WYRE FOREST",1,322
+"301","West Midlands","WYCHAVON",2,319
+"300","West Midlands","WORCESTER",3,317
+"299","West Midlands","WOLVERHAMPTON",4,316
+"298","West Midlands","WARWICK",5,293
+"297","West Midlands","WALSALL",6,289
+"296","West Midlands","TELFORD AND WREKIN",7,273
+"295","West Midlands","TAMWORTH",8,269
+"294","West Midlands","STRATFORD-ON-AVON",9,260
+"293","West Midlands","STOKE-ON-TRENT",10,259
+"292","West Midlands","STAFFORDSHIRE MOORLANDS",11,255
+"291","West Midlands","STAFFORD",12,254
+"290","West Midlands","SOUTH STAFFORDSHIRE",13,245
+"289","West Midlands","SOLIHULL",14,231
+"288","West Midlands","SHROPSHIRE",15,229
+"287","West Midlands","SANDWELL",16,221
+"286","West Midlands","RUGBY",17,214
+"285","West Midlands","REDDITCH",18,204
+"284","West Midlands","NUNEATON AND BEDWORTH",19,190
+"283","West Midlands","NORTH WARWICKSHIRE",20,184
+"282","West Midlands","NEWCASTLE-UNDER-LYME",21,171
+"281","West Midlands","MALVERN HILLS",22,156
+"280","West Midlands","LICHFIELD",23,150
+"279","West Midlands","EAST STAFFORDSHIRE",24,89
+"278","West Midlands","DUDLEY",25,79
+"277","West Midlands","COVENTRY",26,67
+"276","West Midlands","CANNOCK CHASE",27,45
+"275","West Midlands","BROMSGROVE",28,37
+"274","West Midlands","BIRMINGHAM",29,19
+"323","Yorkshire and The Humber","YORK",1,323
+"322","Yorkshire and The Humber","WAKEFIELD",2,288
+"321","Yorkshire and The Humber","SHEFFIELD",3,227
+"320","Yorkshire and The Humber","SELBY",4,225
+"319","Yorkshire and The Humber","SCARBOROUGH",5,222
+"318","Yorkshire and The Humber","RYEDALE",6,219
+"317","Yorkshire and The Humber","ROTHERHAM",7,213
+"316","Yorkshire and The Humber","RICHMONDSHIRE",8,208
+"315","Yorkshire and The Humber","NORTH LINCOLNSHIRE",9,180
+"314","Yorkshire and The Humber","NORTH EAST LINCOLNSHIRE",10,177
+"313","Yorkshire and The Humber","LEEDS",11,146
+"312","Yorkshire and The Humber","KIRKLEES",12,142
+"311","Yorkshire and The Humber","KINGSTON UPON HULL, CITY OF",13,140
+"310","Yorkshire and The Humber","HARROGATE",14,119
+"309","Yorkshire and The Humber","HAMBLETON",15,114
+"308","Yorkshire and The Humber","EAST RIDING OF YORKSHIRE",16,88
+"307","Yorkshire and The Humber","DONCASTER",17,77
+"306","Yorkshire and The Humber","CRAVEN",18,68
+"305","Yorkshire and The Humber","CALDERDALE",19,42
+"304","Yorkshire and The Humber","BRADFORD",20,28
+"303","Yorkshire and The Humber","BARNSLEY",21,11

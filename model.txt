@@ -1,0 +1,76 @@
+
+    model
+    {
+
+    # Hyperpriors
+    tau.age ~ dgamma(0.001, 0.001)
+    tau.ethngrp ~ dgamma(0.001, 0.001)
+    tau.la ~ dgamma(0.01, 0.01)
+    tau.ons ~ dgamma(0.001, 0.001)
+    tau.met ~ dgamma(0.01, 0.01)
+    tau.conception ~ dgamma(0.01, 0.01)
+    tau.gor ~ dgamma(0.001, 0.001)
+    #tau.b ~ dgamma(0.001, 0.001)
+
+    # Priors
+    alpha ~ dunif(-2,1)
+    b.male ~ dunif(-2,1)
+    b.IMD ~ dunif(-2,1)
+    b.student ~ dunif(-2,1)
+    b.hhsize1 ~ dunif(-2,1)
+    #b.london ~ dunif(-2,2)
+
+    # Likelihood
+    for(i in 1:n) {
+
+        #b[i] ~ dnorm(0, tau.b)
+        cttestly[i] ~ dbin(p[i], N)
+        logit(p[i]) <- alpha + b.male*male[i] +
+                        b.student*student[i] +
+                        b.hhsize1*hhsize1[i] +
+                        b.IMD*IMD.upperQ[i] +
+                        v[age[i]] +
+                        w[ethgrp[i]] +
+                        r[la.factor[i]] +
+                        g[metcounty.UA[i]] +
+                        h[gor[i]] +
+                        u[ONSclass[i]] +
+                        d[conception[i]]
+                        #b.london*LAlondon[la.factor[i]] #+ b[i]
+        cttestly.rep[i] ~ dbin(p[i], N)
+    }
+    # age
+    for(k in 1:K) {
+        v[k] ~ dnorm(0, tau.age)
+    }
+    # ethnic group
+    for(l in 1:L) {
+        w[l] ~ dnorm(0, tau.ethngrp)
+    }
+    # LA
+    for(s in 1:S) {
+       r[s] ~ dnorm(0, tau.la)
+    }
+    # met county
+    for(m in 1:M) {
+        g[m] ~ dnorm(0, tau.met)
+    }
+    # Region
+    for(q in 1:Q) {
+        h[q] ~ dnorm(0, tau.gor)
+    }
+    # ONS urban-rural classification
+    for(j in 1:J) {
+        u[j] ~ dnorm(0, tau.ons)
+    }
+    # <=18 years old conception rate
+    for(e in 1:E) {
+        d[e] ~ dnorm(0, tau.conception)
+    }
+
+# odds-ratios
+# or.male = exp(b.male)
+# or.student = exp(b.student)
+
+    }
+    

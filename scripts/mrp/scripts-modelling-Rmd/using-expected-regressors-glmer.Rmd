@@ -1,0 +1,149 @@
+---
+output: word_document
+---
+
+
+```{r preamble}
+library(lme4)
+library(car)
+library(arm)
+library(pander)
+library(knitr)
+library(stargazer)
+library(xtable)
+library(lattice)
+library(plyr)
+library(blme)
+# library(reshape)
+library(reshape2)
+library(optimx)
+
+library(STIecoPredict)
+```
+
+```{r}
+# load("C:/Users/ngreen1/Dropbox/small-area & chlamydia/R_code/scripts/mrp/data/cleaned-regn-input-mrpNatsal.RData")
+load("./data/cleaned-regn-input-mrpNatsal.RData")
+Natsal0 <- Natsal
+```
+
+```{r}
+savedata <- FALSE
+showplot <- TRUE
+```
+
+```{r Natsal-subsets}
+## older ages sparsely sampled
+Natsal <- subset(Natsal, age>15 & age<25)   #NCSP range
+
+## same sex partner in last year
+# Natsal <- subset(Natsal, sam1yr==0)
+
+Natsal$sex1yr <- (Natsal$het1yr!=0 | Natsal$sam1yr!=0)
+Natsal$livealone <- (Natsal$hhsize==1)
+
+# names.atleast1test <- rownames(table(Natsal$laname, Natsal$cttestly))[table(Natsal$laname, Natsal$cttestly)[,"1"]>0]
+# names.LAbigenough <- names(table(Natsal$laname)[(table(Natsal$laname))>10])
+# 
+# subnames <- names.LAbigenough[names.LAbigenough%in%names.atleast1test]
+# Natsal2  <- subset(Natsal, laname%in%subnames)
+Natsal2 <- Natsal
+```
+
+```{r glmer-model-logistic}
+fit <- glmer(
+    formula = cttestly ~ 1 + sex + (1|sex.age) + (1|ethnic2) + livealone + student + sex1yr + #I(sam1yr==0) +
+                       # (1|Conception.decile) +  (1|`Numerical classification`) + I(`Average Score`>28) +
+                        (1|laname) + (1|gor) + (1|metcounty_UA),
+                 family = binomial(link="logit"),
+             data = Natsal2)
+```
+
+
+```{r}
+fit.sex1yr <- glmer(
+    formula = sex1yr ~ 1 + sex + (1|sex.age) + (1|ethnic2) + livealone + student +
+                       # (1|Conception.decile) +  (1|`Numerical classification`) + I(`Average Score`>28) +
+                        (1|laname) + (1|gor) + (1|metcounty_UA),
+                 family = binomial(link="logit"),
+             data = Natsal2)
+```
+
+
+```{r missing_LA eval=TRUE}
+## add some missing random effects
+missingLANatsal.names <- unique(Natsal0$laname)[!unique(Natsal0$laname)%in%rownames(ranef(fit)$laname)]
+missingLAsim_prop.names <- unique(sim_prop_la$LAname)[!unique(sim_prop_la$LAname)%in%rownames(ranef(fit)$laname)]
+missingLA.names <- union(missingLAsim_prop.names, missingLANatsal.names)
+
+la.ranefs <- array(0, dim=c(length(missingLA.names),1))
+dimnames(la.ranefs) <- list(missingLA.names, "(Intercept)")
+la.ranefs <- rbind(ranef(fit)$laname, la.ranefs)
+
+missingmetUANatsal.names <- unique(Natsal0$metcounty_UA)[!unique(Natsal0$metcounty_UA)%in%rownames(ranef(fit)$metcounty_UA)]
+missingmetUAsim_prop.names <- unique(sim_prop_la$metcounty_UA)[!unique(sim_prop_la$metcounty_UA)%in%rownames(ranef(fit)$metcounty_UA)]
+missingmetUA.names <- na.omit(union(missingmetUAsim_prop.names, missingmetUANatsal.names))
+
+metUA.ranefs <- array(0, dim=c(length(missingmetUA.names),1))
+dimnames(metUA.ranefs) <- list(missingmetUA.names, "(Intercept)")
+metUA.ranefs <- rbind(ranef(fit)$metcounty_UA, metUA.ranefs)
+
+missinggorNatsal.names <- unique(Natsal0$gor)[!unique(Natsal0$gor)%in%rownames(ranef(fit)$gor)]
+missinggorsim_prop.names <- unique(sim_prop_la$gor)[!unique(sim_prop_la$gor)%in%rownames(ranef(fit)$gor)]
+missinggor.names <- union(missinggorsim_prop.names, missinggorNatsal.names)
+
+gor.ranefs <- array(0, dim=c(length(missinggor.names),1))
+dimnames(gor.ranefs) <- list(missinggor.names, "(Intercept)")
+gor.ranefs <- rbind(ranef(fit)$gor, gor.ranefs)
+```
+
+```{r}
+fixeff.formula <- as.formula("cttestly ~ student + sex + age + ethnic2 + livealone")
+
+## census data
+# test.calcTotalProbs(sim_prop_la)
+sim_prop_la.fit <- calcTotalProbs(formula=fixeff.formula, data=sim_prop_la,
+                                  extracols = c("LAname","gor","Average Score","metcounty_UA","Numerical classification","Conception.deciles"))
+
+## ad-hoc harmonising between arays
+names(sim_prop_la.fit)[names(sim_prop_la.fit)=="LAname"] <- "laname"
+sim_prop_la.fit$LAname <- sim_prop_la.fit$laname
+sim_prop_la.fit$"sex.age" <- paste(sim_prop_la.fit$sex, sim_prop_la.fit$age, sep=".")
+sim_prop_la.fit <- sim_prop_la.fit[sim_prop_la.fit$laname%in%Natsal2$laname,]
+
+predict.sex1yr <- predict(fit.sex1yr, newdata=sim_prop_la.fit, type="response")
+
+pred <- arm::invlogit(
+                    fixef(fit)["(Intercept)"] +
+                     
+                    fixef(fit)["sexWomen"]*(sim_prop_la.fit$sex=="Women") +
+                 
+                    fixef(fit)["studentTRUE"]*(sim_prop_la.fit$student) +
+                        
+                    fixef(fit)["livealoneTRUE"]*(sim_prop_la.fit$livealone) +
+                 
+                    ranef(fit)$ethnic2[as.character(sim_prop_la.fit$ethnic2),1] +
+
+                    ##ranef(fit)$age[as.character(sim_prop_la.fit$age),1] +
+                      
+                    ranef(fit)$'sex.age'[paste(sim_prop_la.fit$sex, sim_prop_la.fit$age, sep="."), 1] +
+                        
+                    ## ranef(fit)$laname[as.character(sim_prop_la.fit$laname),1] +
+                    la.ranefs[as.character(sim_prop_la.fit$laname),1] +
+                        
+                    ranef(fit)$gor[as.character(sim_prop_la.fit$gor),1] +
+                    ## fixef(fit)["I(gor == 9)TRUE"]*(sim_prop_la.fit$gor==9)    #london
+                        
+                    ## ranef(fit)$metcounty_UA[as.character(sim_prop_la.fit$metcounty_UA),1] #+
+                    metUA.ranefs[as.character(sim_prop_la.fit$metcounty_UA),1] +
+                    
+                    #fixef(fit)["I(`Average Score` > 28)TRUE"]*(sim_prop_la.fit$`Average Score`>28) +
+                      
+                    #ranef(fit)$`Numerical classification`[as.character(sim_prop_la.fit$`Numerical classification`),1] +
+                        
+                    #ranef(fit)$Conception.decile[as.character(sim_prop_la.fit$Conception.deciles),1] +
+                        
+                    fixef(fit)["sex1yrTRUE"]*predict.sex1yr
+)
+```
+

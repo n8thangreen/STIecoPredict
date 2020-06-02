@@ -35,7 +35,7 @@ sin2_England <- read.dta("C:/Users/nathan.green/Documents/chlamydia/data/NATSAL/
 sin2_London <- read.dta("C:/Users/nathan.green/Documents/chlamydia/data/NATSAL/SIN2_subsets/SIN2 & london 14July2014_stataV12.dta")
 
 ## household sizes
-sin2_household <- readstata13::read.dta13("C:/Users/ngreen1/Dropbox/small-area & chlamydia/R_code/packages/STIecoPredict/inst/extdata/sin2-householdsize_22June2016.dta")
+sin2_household <- readstata13::read.dta13("inst/extdata/sin2-householdsize_22June2016.dta")
 
 ## ethnic group mapping to fewer, amalgamated groups
 Natsalethgrp.mapping <- read.csv("C:/Users/nathan.green/Documents/chlamydia/classifier/data/Natsal_fewerethgrps_mapping.csv")
@@ -44,7 +44,7 @@ Natsalethgrp.mapping <- read.csv("C:/Users/nathan.green/Documents/chlamydia/clas
 ```{r}
 devtools::load_all(".")
 setwd(system.file(package = "STIecoPredict"))
-load(file="../data/eul_natsal_2010_for_archive.RData")
+load(file = "../data/eul_natsal_2010_for_archive.RData")
 ```
 
 

@@ -1,0 +1,202 @@
+---
+    title: Regression model selection
+    output: word_document
+editor_options: 
+  chunk_output_type: console
+---
+    
+Investigate which covariates to include in the main model.
+
+<!-- https://ase.tufts.edu/gsc/gradresources/guidetomixedmodelsinr/mixed%20model%20guide.html -->
+    
+```{r}
+library(lme4)
+library(car)
+library(arm)
+library(pander)
+library(knitr)
+library(stargazer)
+library(xtable)
+library(lattice)
+library(plyr)
+require(memisc)
+library(sjPlot)
+
+library(STIecoPredict)
+
+# load("C:/Users/ngreen1/Dropbox/small-area & chlamydia/R_code/scripts/mrp/data/cleaned-regn-input-mrpNatsal.RData")
+load("./data/cleaned-regn-input-mrpNatsal.RData")
+```
+
+
+```{r}
+Natsal[] <- lapply(Natsal, unclass)
+Natsal0 <- Natsal
+## older ages sparsely sampled
+Natsal <- subset(Natsal, age > 15 & age < 45)
+```
+
+```{r missing data}
+##TODO: why are there missing data??
+
+# fill with mean
+# Natsal$Conception.decile[is.na(Natsal$Conception.decile)] <- 5
+# Natsal$`Average Score`[is.na(Natsal$`Average Score`)] <- 1
+# Natsal$`Numerical classification`[is.na(Natsal$`Numerical classification`)] <- 3 #not great because this is a big group!
+
+# drop missing records
+Natsal <- subset(Natsal, !is.na(`Numerical classification`) & !is.na(`Average Score`) & !is.na(Conception.decile))
+```
+
+
+What range do we want to regress over?
+The surveillance data is only for <24 years olds in most cases so there's probably no point in using all ages.
+
+```{r without_region}
+# http://stats.stackexchange.com/questions/31569/questions-about-how-random-effects-are-specified-in-lmer
+
+fit_age <- glmer(formula = cttestly ~ 1 + (1|age),
+              data = Natsal, family = binomial(link = "logit"))#,
+              # weights = total_wt)
+
+fit_sex <- lm(formula = cttestly ~ 1 + sex, data = Natsal)
+
+fit_agesex <- update(fit0, .~. + sex)
+
+fit_ethnic2 <- update(fit_agesex, .~. + ethnic2)
+
+fit_student <- update(fit_agesex, .~. + student)
+
+fit_livealone <- update(fit_agesex, .~. +  I(hhsize == 1))
+
+fit17 <- update(fit_agesex, .~. + ethnic2:student)
+
+## random slopes
+fit14 <- update(fit_agesex, .~. - (1|age) + (sex|age))
+
+fit26 <- update(fit_agesex, .~. - (1|age) + (student|age))
+
+fit261 <- update(fit_agesex, .~. - (1|age) + (ethnic2|age))
+
+fit262 <- update(fit_agesex, .~. - (1|age) + (I(hhsize == 1)|age))
+
+fit_fullNatsal <- update(fit_agesex, .~. + ethnic2 + student + I(hhsize == 1))
+
+```
+
+```{r stepwise regression}
+# dont know how to do this for multilevel models
+#??
+
+```
+
+
+```{r with_region}
+
+fit_gor <- glmer(formula = cttestly ~ 1 + (1|gor),
+               data = Natsal,
+               family = binomial(link = "logit"))#,
+               # weights = total_wt)
+
+fit_fullNatsalgor <- update(fit_fullNatsal, .~. + (1|gor))
+
+# area covariates
+fit_conception <- update(fit_fullNatsalgor, .~. + (1|Conception.decile))
+
+fit_numclass <- update(fit_fullNatsalgor, .~. + (1|`Numerical classification`))
+
+fit_IMD <- update(fit_fullNatsalgor, .~. + I(`Average Score` > 28))
+
+fit_county <- update(fit_fullNatsalgor, .~. + (1|metcounty_UA))
+
+## final model
+fit_final <- update(fit_fullNatsalgor, .~. + (1|Conception.decile) + (1|`Numerical classification`) + I(`Average Score` > 28) + (1|metcounty_UA))
+
+out <- anova(fit_age, fit_sex, fit_agesex, fit_ethnic2, fit_student, fit_livealone,
+             fit17, fit14, fit26, fit261, fit262, fit_fullNatsal,
+             fit_gor, fit_fullNatsalgor, fit_conception, fit_numclass, fit_IMD, fit_county,
+             fit_final)
+  
+pander(out)
+  
+# attr(x = out, "heading")
+Formula <-
+c("fit_age: cttestly ~ 1 + (1 | age)"                                                          ,  "fit_gor: cttestly ~ 1 + (1 | gor)"                                                        ,
+ "fit_sex: cttestly ~ 1 + sex"                                                               ,   "fit_agesex: cttestly ~ (1 | age) + sex"                                                  ,
+ "fit_ethnic2: cttestly ~ (1 | age) + sex + ethnic2"                                         ,   "fit_student: cttestly ~ (1 | age) + sex + student"                                       ,
+ "fit_livealone: cttestly ~ (1 | age) + sex + I(hhsize == 1)"                                ,   "fit17: cttestly ~ (1 | age) + sex + ethnic2:student"                                     ,
+ "fit14: cttestly ~ sex + (sex | age)"                                                       ,   "fit26: cttestly ~ sex + (student | age)"                                                 ,
+ "fit261: cttestly ~ sex + (ethnic2 | age)"                                                  ,   "fit262: cttestly ~ sex + (I(hhsize == 1) | age)"                                         ,
+ "fit_fullNatsal: cttestly ~ (1 | age) + sex + ethnic2 + student + I(hhsize == 1)"                                                                  ,
+ "fit_fullNatsalgor: cttestly ~ (1 | age) + sex + ethnic2 + student + I(hhsize == 1) + (1 | gor)"                                                   ,
+ "fit_conception: cttestly ~ (1 | age) + sex + ethnic2 + student + I(hhsize == 1) + (1 | gor) + (1 | Conception.decile)"                            ,
+ "fit_numclass: cttestly ~ (1 | age) + sex + ethnic2 + student + I(hhsize == 1) + (1 | gor) + (1 | `Numerical classification`)"                     ,
+ "fit_IMD: cttestly ~ (1 | age) + sex + ethnic2 + student + I(hhsize == 1) + (1 | gor) + I(`Average Score` > 28)"                                   ,
+ "fit_county: cttestly ~ (1 | age) + sex + ethnic2 + student + I(hhsize == 1) + (1 | gor) + (1 | metcounty_UA)"                                     ,
+ "fit_final: cttestly ~ (1 | age) + sex + ethnic2 + student + I(hhsize == 1) + (1 | gor) + (1 | Conception.decile) + (1 | `Numerical classification`) + I(`Average Score` > 28) + (1 | metcounty_UA)")
+
+write.csv(
+  cbind(Formula, out),
+  # out,
+  file = "data/anova_table.csv")
+```
+
+
+```{r main-model}
+fit <- glmer(formula = cttestly ~ 1 + sex + (1|sex.age) + (1|ethnic2) + student + I(hhsize == 1) + (1|Conception.decile) +
+                        (1|`Numerical classification`) + (1|laname) + (1|gor) + I(`Average Score` > 28) + (1|metcounty_UA),
+             data = Natsal,
+             family = binomial(link = "logit"))#,
+             # weights = total_wt.int)
+# save(fit, file="C:/Users/nathan.green/Dropbox/small-area & chlamydia/R_code/scripts/mrp/data/fit.RData")
+
+# step() #doesn't work for random effects models
+```
+
+
+```{r print_fit}
+# display(fit)
+fit
+ranef(fit)
+se.ranef(fit)
+```
+
+```{r summary table in HTML, eval=F}
+
+sjt.glmer(fit)
+x <- sjt.glmer(fit)
+x
+
+stargazer(fit, type="html")
+```
+
+
+```{r prediction_plot, eval=FALSE}
+model1 <- glmer(cttestly ~ 1 + (1|age),
+                formula = binomial,
+                data = Natsal)
+xv <- seq(0,45,1)
+y <- predict(model1, type = "response")
+plot(Natsal$age, Natsal$cttestly)
+points(Natsal$age, y, col = "red")
+```
+
+```{r ranef_plots}
+lattice::dotplot(ranef(fit, condVar = TRUE))
+qqmath(fit)
+```
+
+
+```{r try_all_optimisers, eval=FALSE}
+# http://stackoverflow.com/questions/23478792/warning-messages-when-trying-to-run-glmer-in-r
+
+##TODO: is this in lme4??
+aa <- allFit(fit)
+is.OK <- sapply(aa, is, "merMod")
+## extract just the successful ones
+aa.OK <- aa[is.OK]
+
+lapply(aa.OK, function(x) x@optinfo$conv$lme4$messages)  #messages
+```
+
+

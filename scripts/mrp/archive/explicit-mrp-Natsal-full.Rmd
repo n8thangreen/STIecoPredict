@@ -1,0 +1,251 @@
+---
+output: word_document
+---
+
+
+```{r}
+library(lme4)
+library(car)
+library(arm)
+library(pander)
+library(knitr)
+library(stargazer)
+library(xtable)
+library(lattice)
+
+library(STIecoPredict)
+
+load("C:/Users/ngreen1/Dropbox/small-area & chlamydia/R_code/scripts/mrp/data/cleaned-regn-input-mrpNatsal.RData")
+```
+
+
+What are range do we want to regress over? The surveillance data is only for <24 years olds in most cases so theres probably no point in using all ages.
+
+```{r without_region}
+# http://stats.stackexchange.com/questions/31569/questions-about-how-random-effects-are-specified-in-lmer
+
+fit0 <- glmer(formula = cttestly ~ 1+(1|age),
+              data = Natsal, family = binomial(link="logit"), weights = total_wt)
+
+## a null model
+fit12 <- fit0
+summary(fit12)
+
+fit13 <- update(fit0, .~. + sex)
+summary(fit13)
+
+fit14 <- update(fit13, .~. - (1|age) + (sex|age))
+summary(fit14)
+
+fit15 <- update(fit13, .~. + ethnic2)
+summary(fit15)
+
+fit16 <- update(fit15, .~. + smokenow+increasingdrinker)
+summary(fit16)
+
+fit17 <- update(fit14, .~. + ethnic2+smokenow+increasingdrinker)
+summary(fit17)
+
+pander(anova(fit12, fit13, fit14, fit15, fit16, fit17))
+```
+
+
+```{r with_region}
+
+## a null model
+fit21 <- glmer(formula = cttestly ~ 1+(1|gor),
+              data = Natsal, family = binomial(link="logit"), weights = total_wt)
+summary(fit21)
+
+fit22 <- update(fit21, .~. + sex+(1|age))
+summary(fit22)
+
+fit23 <- update(fit22, .~. + ethnic2+student)
+summary(fit23)
+
+fit24 <- update(fit23, .~. + smokenow+increasingdrinker)
+summary(fit24)
+
+fit25 <- update(fit24, .~. - sex - student + sex*student)
+summary(fit25)
+
+## random slopes
+fit26 <- update(fit25, .~. - (1|age) + (student|age))
+summary(fit26)
+
+fit261 <- update(fit25, .~. - (1|age) + (ethnic2|age))
+summary(fit261)
+
+## a saturated model
+fit27 <- fit26 <- update(fit25, .~. - (1|age) + (student:ethnic2|age))
+summary(fit27)
+
+pander(anova(fit21, fit22, fit23, fit24, fit25, fit26, fit261, fit27))
+
+pander(anova(fit12, fit13, fit14, fit15, fit16, fit17, fit21, fit22, fit23, fit24, fit25, fit26, fit261, fit27))
+```
+
+
+```{r}
+fitsat <- glmer(formula = cttestly ~ 1+sex+student+smokenow+ (1|age)+(increasingdrinker|ethnic2)+(1|gor),
+              data = Natsal, family = binomial(link="logit"), weights = total_wt.int)
+                
+# save(fitsat, file="C:/Users/nathan.green/Dropbox/small-area & chlamydia/R_code/scripts/mrp/data/fitsat.RData")
+
+fit <- fitsat
+# step() doesn't work for random effects models
+```
+
+
+```{r}
+fit <- fitsat
+
+# display(fit)
+
+ranef(fit)
+se.ranef(fit)
+```
+
+
+```{r}
+## prediction plot
+model1 <- glmer(cttestly~1+(1|age), binomial, data=Natsal)
+xv <- seq(0,45,1)
+y <- predict(model1, type="response")
+plot(Natsal$age, Natsal$cttestly)
+points(Natsal$age, y, col="red")
+```
+
+```{r}
+## random effects plots
+lattice::dotplot(ranef(fitsat, condVar=TRUE))
+qqmath(fitsat)
+```
+
+
+```{r try-all-optimisers, eval=FALSE}
+# http://stackoverflow.com/questions/23478792/warning-messages-when-trying-to-run-glmer-in-r
+
+aa <- allFit(fit)
+is.OK <- sapply(aa,is,"merMod")
+## extract just the successful ones
+aa.OK <- aa[is.OK]
+
+lapply(aa.OK,function(x) x@optinfo$conv$lme4$messages)  #messages
+
+```
+
+
+# Append predictions to joint distribution dataset
+
+```{r}
+
+formula <- paste(fit@call$formula, collapse = "")
+
+## convert formula to fixed effect model with same variables
+TERMS <- attr(terms(fit@call$formula),"term.labels")
+TERMS <- unlist(strsplit(TERMS, split=" \\| "))
+TERMS <- gsub(" ", "", TERMS, fixed = TRUE)
+TERMS <- TERMS[TERMS!="1" & TERMS!="gor"]
+
+fixeff.formula <- as.formula(paste("cttestly~",paste(TERMS, collapse = "+"),sep=""))
+
+## census data
+# test.calcTotalProbs(sim_prop_la)
+sim_prop_la <- calcTotalProbs(formula=fixeff.formula, data=sim_prop_la, extracols = c("LAname","gor"))
+
+
+pred <- invlogit(fixef(fit)["(Intercept)"] +
+                     (fixef(fit)["sexWomen"]*(sim_prop_la$sex=="Women")) +
+                     (fixef(fit)["studentTRUE"]*sim_prop_la$student) +
+                   
+                    # if(grep("+ethnic2", formula)==1){}
+                     # (fixef(fit)["studentTRUE:sexWomen"]*(sim_prop_la$sex=="Women" & sim_prop_la$student)) +
+                     # (fixef(fit)["ethnic2ASIAN/ASIAN BRITISH"]*(sim_prop_la$ethnic2=="ASIAN/ASIAN BRITISH")) +
+                     # (fixef(fit)["ethnic2BLACK/BLACK BRITISH"]*(sim_prop_la$ethnic2=="BLACK/BLACK BRITISH")) +
+                     # (fixef(fit)["ethnic2CHINESE"]*(sim_prop_la$ethnic2=="CHINESE")) +
+                     # (fixef(fit)["ethnic2MIXED"]*(sim_prop_la$ethnic2=="MIXED")) +
+                     # (fixef(fit)["ethnic2OTHER"]*(sim_prop_la$ethnic2=="OTHER")) +
+                     # (fixef(fit)["ethnic2NOT ANSWERED"]*(sim_prop_la$ethnic2=="NOT ANSWERED")) +
+                   
+                     (fixef(fit)["smokenowTRUE"]*sim_prop_la$smokenow) +
+                     
+                    # if(grep("+increasingdrinker", formula)==1){}                     
+                     # (fixef(fit)["increasingdrinkerTRUE"]*sim_prop_la$increasingdrinker)+
+                     
+                   # if(grep("\\(student|age\\)", formula)==1){}
+                     # (ranef(fit)$age[as.character(sim_prop_la$age),2]*sim_prop_la$student) +
+                   
+                   # if(grep("\\(1|ethnic2\\)", formula)==1){}
+                      ranef(fit)$ethnic2[as.character(sim_prop_la$ethnic2),1] +
+                   
+                   # if(grep("\\(increasingdrinker|ethnic2\\)", formula)==1){}
+                      ranef(fit)$ethnic2[as.character(sim_prop_la$ethnic2),"(Intercept)"] +
+                      ranef(fit)$ethnic2[as.character(sim_prop_la$ethnic2),2]*sim_prop_la$increasingdrinker +
+    
+                   # if(grep("\\(ethnic2|age\\)", formula)==1){}
+                     # (ranef(fit)$age[as.character(sim_prop_la$age), "(Intercept)"]) +
+                     # (ranef(fit)$age[as.character(sim_prop_la$age), "ethnic2ASIAN/ASIAN BRITISH"]*(sim_prop_la$ethnic2=="ASIAN/ASIAN BRITISH")) +
+                     # (ranef(fit)$age[as.character(sim_prop_la$age), "ethnic2BLACK/BLACK BRITISH"]*(sim_prop_la$ethnic2=="BLACK/BLACK BRITISH")) +
+                     # (ranef(fit)$age[as.character(sim_prop_la$age), "ethnic2CHINESE"]*(sim_prop_la$ethnic2=="CHINESE")) +
+                     # (ranef(fit)$age[as.character(sim_prop_la$age), "ethnic2MIXED"]*(sim_prop_la$ethnic2=="MIXED")) +
+                     # (ranef(fit)$age[as.character(sim_prop_la$age), "ethnic2OTHER"]*(sim_prop_la$ethnic2=="OTHER")) +
+                     # (ranef(fit)$age[as.character(sim_prop_la$age), "ethnic2NOT ANSWERED"]*(sim_prop_la$ethnic2=="NOT ANSWERED")) +
+
+                   # if(grep("\\(1|age\\)", formula)==1){}
+                     ranef(fit)$age[as.character(sim_prop_la$age),1] +
+                 
+                   # if(grep("\\(1|age.scaled\\)", formula)==1){}
+                     # ranef(fit)$age.scaled[as.character(sim_prop_la$age.scaled),1] +
+                   
+                   # if(grep("\\(1|gor\\)", formula)==1){}
+                     ranef(fit)$gor[as.character(sim_prop_la$gor),1]
+                   )
+
+predweighted <- pred * sim_prop_la$totalprob
+LApred <- tapply(predweighted, sim_prop_la$LAname, sum)
+```
+
+The LA specific post-stratified estimates are then
+```{r}
+as.data.frame(LApred[order(LApred)])
+```
+
+
+# Simpler models
+
+##complete pooling
+```{r, eval=F}
+fit <- lm(formula = cttestly ~ 1,
+          data = Natsal, family = binomial(link="logit"))
+```
+
+# No pooling: separate estimate within each Region
+```{r, eval=F}
+fitsep <- list()
+for (i in unique(Natsal$gor)){
+        fitsep[[i]] <- update(fit, data=Natsal[Natsal$gor==i])
+
+    # fitsep[[i]] <- glmer(formula = cttestly ~ (1|sex)+(1|age)+(1|ethnic2)+smokenow+increasingdrinker+(1|gor),
+    #                   data = Natsal[Natsal$gor==1], family = binomial(link="logit"))
+}
+```
+
+
+
+
+```{r age-sex_only, eval=F}
+pred <- invlogit(fixef(fit)["(Intercept)"] +
+                     (fixef(fit)["sexWomen"]*(LApop$sex=="Women")) +
+                     ranef(fit)$age[as.character(LApop$age),1]
+                   )
+
+predweighted <- pred * LApop$pop.adj
+LApred <- tapply(predweighted, LApop$Name, sum)
+```
+
+The LA specific post-stratified estimates are then
+```{r, eval=F}
+as.data.frame(LApred[order(LApred)])
+```
+

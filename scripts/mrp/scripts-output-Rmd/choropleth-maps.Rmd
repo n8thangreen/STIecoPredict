@@ -1,0 +1,735 @@
+---
+title: "Choropleth maps: mrp Natsal"
+author: "N Green"
+date: "19 March 2016"
+output: word_document
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.width=12, fig.height=8,
+                      echo=FALSE, warning=FALSE, message=FALSE)
+```
+
+```{r}
+library(rgdal)
+library(rgeos)
+library(ggplot2)
+library(gridExtra)
+library(RColorBrewer)
+# library(plyr)
+library(dplyr) 
+library(Hmisc)
+library(mapproj)
+library(maptools)
+library(STIecoPredict)
+library(tmap)
+library(fields)
+```
+
+Load in MRP predictions
+
+```{r WinBUGS-data}
+load(file="data/CTADGUM_pred-WinBUGS.RData")
+
+MCMCcols <- grepl(pattern="^V[1234567890]+", x=names(CTADGUM_pred))
+CTADGUM_pred$p.surveil_greaterthan_mrp = apply(sweep(CTADGUM_pred[,MCMCcols], 1, CTADGUM_pred$surv2011.1624, "<"), 1, sum, na.rm=T)/sum(MCMCcols)
+CTADGUM_pred_WinBUGS <- CTADGUM_pred
+```
+
+```{r blmer-data}
+load("./data/CTADGUM_pred-with-LA.RData")
+```
+
+Load in map data and join with MRP data
+
+```{r load-map-data}
+la.region.plot.lookup <- read.csv("data/la-region-plot-lookup.csv")
+
+setwd("../../packages/STIecoPredict")
+# setwd(system.file(package="STIecoPredict"))
+
+UKla <- readOGR(dsn = "data/maps", layer = "LAD_DEC_2011_GB_BGC")
+Londonla <- readOGR(dsn = "data/maps", layer = "london_sport")
+Englandla <- readOGR(dsn = "data/maps", layer = "england_lad_2011")
+
+names(Londonla@data)[names(Londonla@data)=="name"] <- "LAD11NM"
+names(Englandla@data)[names(Englandla@data)=="name"] <- "LAD11NM"
+
+UKla@data$LAD11NM <- toupper(UKla@data$LAD11NM)
+Londonla@data$LAD11NM <- toupper(Londonla@data$LAD11NM)
+Englandla@data$LAD11NM <- toupper(Englandla@data$LAD11NM)
+
+UKla0 <- UKla
+Londonla0 <- Londonla
+Englandla0 <- Englandla
+```
+
+```{r}
+names(CTADGUM_pred) <- sub("LA Name", "LAD11NM", names(CTADGUM_pred))
+names(CTADGUM_pred_WinBUGS) <- sub("LA Name", "LAD11NM", names(CTADGUM_pred_WinBUGS))
+```
+
+
+### Estimates
+
+```{r Bayesian-posterior-prob-above-expected}
+out <- data.frame(LAD11NM=CTADGUM_pred_WinBUGS$LAD11NM,
+                  p.greaterthan=as.numeric(CTADGUM_pred_WinBUGS$p.surveil_greaterthan_mrp))
+
+out$LAD11NM <- LAnameClean(out$LAD11NM)
+UKla@data$LAD11NM <- LAnameClean(UKla@data$LAD11NM)
+Londonla@data$LAD11NM <- LAnameClean(Londonla@data$LAD11NM)
+Englandla@data$LAD11NM <- LAnameClean(Englandla@data$LAD11NM)
+
+UKla@data <- left_join(UKla0@data, out, by="LAD11NM")
+Londonla@data <- left_join(Londonla0@data, out, by="LAD11NM")
+Englandla@data <- left_join(Englandla0@data, out, by="LAD11NM")
+
+##TODO##
+## go back and debug why these LAs are missing in the predictions
+UKla@data$p.greaterthan[is.na(UKla@data$p.greaterthan) & grepl(pattern="^E" ,x=UKla@data$LAD11CD)] <- 0
+Londonla@data$p.greaterthan[is.na(Londonla@data$p.greaterthan)] <- 0
+Englandla@data$p.greaterthan[is.na(Englandla@data$p.greaterthan)] <- 0
+
+## identify which LAs to annotate with number
+UKla@data$LAD11NMgreaterthan <- NA
+UKla@data$LAD11NMgreaterthan[UKla@data$p.greaterthan>0.2 & !is.na(UKla@data$p.greaterthan)] <- UKla@data$LAD11NM[UKla@data$p.greaterthan>0.2 & !is.na(UKla@data$p.greaterthan)]
+
+Londonla@data$LAD11NMgreaterthan <- NA
+Londonla@data$LAD11NMgreaterthan[Londonla@data$p.greaterthan>0.2 & !is.na(Londonla@data$p.greaterthan)] <- Londonla@data$LAD11NM[Londonla@data$p.greaterthan>0.2 & !is.na(Londonla@data$p.greaterthan)]
+
+Englandla@data$LAD11NMgreaterthan <- NA
+Englandla@data$LAD11NMgreaterthan[Englandla@data$p.greaterthan>0.2 & !is.na(Englandla@data$p.greaterthan)] <- Englandla@data$LAD11NM[Englandla@data$p.greaterthan>0.2 & !is.na(Englandla@data$p.greaterthan)]
+
+## join reference LA numbers
+UKla@data <- left_join(UKla@data, la.region.plot.lookup, by = c("LAD11NMgreaterthan"="LA.Name"))
+Londonla@data <- left_join(Londonla@data, la.region.plot.lookup, by = c("LAD11NMgreaterthan"="LA.Name"))
+Englandla@data <- left_join(Englandla@data, la.region.plot.lookup, by = c("LAD11NMgreaterthan"="LA.Name"))
+
+
+############
+## tmap:: ##
+############
+
+x11()
+qtm(UKla, "p.greaterthan", fill.title="Posterior probability\n MRP estimate<NCSP", borders = NA,# text.col = "black",
+    fill.textNA="Scotland and Wales", text="laname.num", text.size=0.5)
+x11()
+qtm(Londonla, "p.greaterthan", fill.title="Posterior probability\n MRP estimate<NCSP",
+    text="laname.num", text.size=0.5)
+x11()
+qtm(Englandla, "p.greaterthan", fill.title="Posterior probability\n MRP estimate<NCSP", borders = NA,# text.col = "black",
+    fill.textNA="Scotland and Wales", text="laname.num", text.size=0.5)
+
+## bubble map
+##TODO##
+# qtm(UKla, borders=NULL) + qtm(UKla, bubble.size = "p.greaterthan", 
+#                               bubble.title.size="Posterior probability chlamydia test")
+
+############
+## base:: ##
+############
+## London and England together
+
+BREAKS <- seq(0,1, length.out = 11)
+COLS <- rev(heat.colors(10))
+
+x11()
+par(oma = c(0,0,0,0))
+plot(Englandla, col = COLS[findInterval(Englandla$p.greaterthan, BREAKS)])
+par(new = TRUE)
+par(oma = c(3,2,1,17)) # par(oma = c(6,2,1,13))
+plot(Londonla, col = COLS[findInterval(Londonla$p.greaterthan, BREAKS, rightmost.closed = TRUE)])
+par(oma = c(0,0,0,0))
+image.plot(legend.only = TRUE, col = COLS, breaks = BREAKS, zlim = c(0,1))
+
+##############
+## ggplot:: ##
+##############
+
+UKla.f <- fortify(UKla, region = "LAD11NM")
+UKla.f <- merge(UKla.f, UKla@data, by.x = "id", by.y = "LAD11NM")
+
+map5 <- ggplot(UKla.f, aes(long, lat, group = group, fill = p.greaterthan)) + geom_polygon()
+
+map5 <- map5 + coord_equal() +
+    labs(x = "", y = "", fill = "Outcome") +
+    ggtitle("") +
+    theme(axis.ticks=element_blank(), axis.text=element_blank()) +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())
+
+## continuous outcomes
+map5 + scale_fill_continuous(low = "yellow", high = "blue") +
+  coord_equal(xlim=c(0, 670000), ylim=c(0, 650000)) # England zoom
+
+# ## discrete outomes
+gs.pal <- colorRampPalette(c("red","blue"),bias=.1,space="rgb")
+
+map <- ggplot(UKla.f, aes(x=long, y=lat, group=group, fill=cut(p.greaterthan, breaks=seq(0,0.5, by=0.05)))) + geom_polygon()
+map + scale_fill_hue(h=c(180, 270)) + scale_fill_discrete("") + coord_equal() +
+    labs(x = "", y = "", fill = "Outcome") +
+    ggtitle("") +
+    theme(axis.ticks=element_blank(), axis.text=element_blank()) +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+  coord_equal(xlim=c(0, 670000), ylim=c(0, 650000)) 
+```
+
+
+```{r predictions-glmer}
+
+out <- data.frame(LAD11NM=CTADGUM_pred$LAD11NM,
+                  LApred=as.numeric(CTADGUM_pred$LApred),
+                  LApred.adj=as.numeric(CTADGUM_pred$LApred.adj))   #need to do this cos problem with rownames!!
+
+out$LAD11NM <- LAnameClean(out$LAD11NM)
+UKla0@data$LAD11NM <- LAnameClean(UKla0@data$LAD11NM)
+Londonla0@data$LAD11NM <- LAnameClean(Londonla0@data$LAD11NM)
+Englandla0@data$LAD11NM <- LAnameClean(Englandla0@data$LAD11NM)
+
+UKla@data <- left_join(UKla0@data, out, by="LAD11NM")
+Londonla@data <- left_join(Londonla0@data, out, by="LAD11NM")
+Englandla@data <- left_join(Englandla0@data, out, by="LAD11NM")
+
+##TODO##
+## go back and debug why these LAs are missing in the predictions
+UKla@data$LApred[is.na(UKla@data$LApred) & grepl(pattern="^E" , x=UKla@data$LAD11CD)] <- 0.4    #average
+Londonla@data$LApred[is.na(Londonla@data$LApred)] <- 0.4
+Englandla@data$LApred[is.na(Englandla@data$LApred)] <- 0.4
+
+
+x11()
+qtm(UKla, "LApred", fill.title="Chlamydia testing\n MRP estimates", borders = NA,
+    fill.textNA="Scotland and Wales")
+x11()
+qtm(Londonla, "LApred", fill.title="Chlamydia testing\n MRP estimates", borders = NA,add=T)
+
+# qtm(UKla, "LApred.adj")
+# qtm(Londonla, "LApred.adj")
+
+##############
+## ggplot:: ##
+##############
+
+UKla.f <- fortify(UKla, region = "LAD11NM")
+UKla.f <- merge(UKla.f, UKla@data, by.x = "id", by.y = "LAD11NM")
+
+map5 <- ggplot(UKla.f, aes(long, lat, group = group, fill = LApred)) + geom_polygon()
+map.adj <- ggplot(UKla.f, aes(long, lat, group = group, fill = LApred.adj)) + geom_polygon()
+
+map5 <- map5 + coord_equal() +
+    labs(x = "", y = "", fill = "Outcome") +
+    ggtitle("") +
+    theme(axis.ticks=element_blank(), axis.text=element_blank()) +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())
+
+## continuous outcomes
+map5 + scale_fill_continuous(low = "yellow", high = "blue") +
+  coord_equal(xlim=c(0, 670000), ylim=c(0, 650000)) # England zoom
+
+# ## discrete outomes
+gs.pal <- colorRampPalette(c("red","blue"),bias=.1,space="rgb")
+
+map <- ggplot(UKla.f, aes(x=long, y=lat, group=group, fill=cut(LApred, breaks=seq(0,0.5, by=0.05)))) + geom_polygon()
+map + scale_fill_hue(h=c(180, 270)) + scale_fill_discrete("") + coord_equal() +
+    labs(x = "", y = "", fill = "Outcome") +
+    ggtitle("") +
+    theme(axis.ticks=element_blank(), axis.text=element_blank()) +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+  coord_equal(xlim=c(0, 670000), ylim=c(0, 650000)) 
+```
+
+```{r age_adjusted_predictions}
+map.adj <- map.adj + coord_equal() +
+    labs(x = "", y = "", fill = "Outcome") +
+    ggtitle("") +
+    theme(axis.ticks=element_blank(), axis.text=element_blank()) +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())
+
+## continuous outcomes
+map.adj + scale_fill_continuous(low = "yellow", high = "blue") +
+  coord_equal(xlim=c(0, 670000), ylim=c(0, 650000)) # England zoom
+
+# ## discrete outomes
+map <- ggplot(UKla.f, aes(x=long, y=lat, group=group, fill=cut(LApred.adj, breaks=seq(0,0.1, by=0.01)))) + geom_polygon()
+map + scale_fill_hue(h=c(270, 360)) + scale_fill_discrete("") + coord_equal() +
+    labs(x = "", y = "", fill = "Outcome") +
+    ggtitle("") +
+    theme(axis.ticks=element_blank(), axis.text=element_blank()) +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+  coord_equal(xlim=c(0, 670000), ylim=c(0, 650000))
+
+```
+
+
+### Binomial Exceedance using SE
+
+```{r eval=FALSE}
+
+out <- data.frame(LAD11NM=CTADGUM_pred$LAD11NM, pred=as.numeric(CTADGUM_pred$predBINmean2011.1524))   #need to do this cos problem with rownames!!
+
+UKla@data <- left_join(UKla0@data, out, by="LAD11NM")
+Londonla@data <- left_join(Londonla0@data, out, by="LAD11NM")
+
+qtm(UKla, "pred")
+qtm(Londonla, "pred")
+
+## for ggplot
+UKla.f <- fortify(UKla, region = "LAD11NM")
+UKla.f <- merge(UKla.f, UKla@data, by.x = "id", by.y = "LAD11NM")
+
+map5 <- ggplot(UKla.f, aes(long, lat, group = group, fill = pred)) + geom_polygon()
+
+map5 <- map5 + coord_equal() +
+    labs(x = "", y = "", fill = "Outcome") +
+    ggtitle("") +
+    theme(axis.ticks=element_blank(), axis.text=element_blank()) +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())
+
+## continuous outcomes
+map5 + scale_fill_continuous(low = "yellow", high = "blue") +
+  coord_equal(xlim=c(0, 670000), ylim=c(0, 650000)) # England zoom
+
+# ## discrete outomes
+map <- ggplot(UKla.f, aes(x=long, y=lat, group=group, fill=cut(pred, breaks=seq(0,0.5, by=0.05)))) + geom_polygon()
+map + scale_fill_hue("clarity") + scale_fill_discrete("") + coord_equal() +
+    labs(x = "", y = "", fill = "Outcome") +
+    ggtitle("") +
+    theme(axis.ticks=element_blank(), axis.text=element_blank()) +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+  coord_equal(xlim=c(0, 670000), ylim=c(0, 650000)) 
+```
+
+
+### Surveillance NCSP data
+
+```{r NCSP-2011}
+
+out <- data.frame(LAD11NM=CTADGUM_pred$LAD11NM,
+                  pred=as.numeric(CTADGUM_pred$surv2011.1524))   #need to do this cos problem with rownames!! ##TODO##
+
+UKla@data <- left_join(UKla0@data, out, by="LAD11NM")
+Londonla@data <- left_join(Londonla0@data, out, by="LAD11NM")
+Englandla@data <- left_join(Englandla0@data, out, by="LAD11NM")
+
+##TODO##
+## go back and debug why these LAs are missing in the predictions
+UKla@data$pred[is.na(UKla@data$pred) & grepl(pattern="^E" ,x=UKla@data$LAD11CD)] <- 0
+Londonla@data$pred[is.na(Londonla@data$pred)] <- 0
+Englandla@data$pred[is.na(Englandla@data$pred)] <- 0
+
+x11()
+qtm(UKla, "pred", fill.title="NCSP 2011",
+        fill.textNA="Scotland and Wales")
+x11()
+qtm(Londonla, "pred", fill.title="NCSP 2011")
+
+x11()
+qtm(Englandla, "pred", fill.title="NCSP 2011")
+
+############
+## base:: ##
+############
+## London and England together
+
+BREAKS <- seq(0, 0.7, length.out = 11)
+COLS <- rev(heat.colors(10))
+
+x11()
+par(oma = c(0,0,0,0))
+plot(Englandla, col = COLS[findInterval(Englandla$pred, BREAKS)])
+par(new = TRUE)
+par(oma = c(3,2,1,17))
+plot(Londonla, col = COLS[findInterval(Londonla$pred, BREAKS, rightmost.closed = TRUE)])
+par(oma = c(0,0,0,0))
+image.plot(legend.only = TRUE, col = COLS, breaks = BREAKS, zlim = c(0,1))
+
+##############
+## ggplot:: ##
+##############
+
+UKla.f <- fortify(UKla, region = "LAD11NM")
+UKla.f <- merge(UKla.f, UKla@data, by.x = "id", by.y = "LAD11NM")
+
+map5 <- ggplot(UKla.f, aes(long, lat, group = group, fill = pred)) + geom_polygon()
+
+map5 <- map5 + coord_equal() +
+    labs(x = "", y = "", fill = "Outcome") +
+    ggtitle("") +
+    theme(axis.ticks=element_blank(), axis.text=element_blank()) +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())
+
+## continuous outcomes
+map5 + scale_fill_continuous(low = "yellow", high = "blue") +
+  coord_equal(xlim=c(0, 670000), ylim=c(0, 650000)) # England zoom
+
+# ## discrete outomes
+map <- ggplot(UKla.f, aes(x=long, y=lat, group=group, fill=cut(pred, breaks=seq(0,0.5, by=0.05)))) + geom_polygon()
+map + scale_fill_hue("clarity") + scale_fill_discrete("") + coord_equal() +
+    labs(x = "", y = "", fill = "Outcome") +
+    ggtitle("") +
+    theme(axis.ticks=element_blank(), axis.text=element_blank()) +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+  coord_equal(xlim=c(0, 670000), ylim=c(0, 650000)) 
+
+```
+
+```{r NCSP-2012}
+
+out <- data.frame(LAD11NM=CTADGUM_pred$LAD11NM,
+                  pred=as.numeric(CTADGUM_pred$surv2012.1524))   #need to do this cos problem with rownames!! ##TODO##
+
+UKla@data <- left_join(UKla0@data, out, by="LAD11NM")
+Londonla@data <- left_join(Londonla0@data, out, by="LAD11NM")
+Englandla@data <- left_join(Englandla0@data, out, by="LAD11NM")
+
+##TODO##
+## go back and debug why these LAs are missing in the predictions
+UKla@data$pred[is.na(UKla@data$pred) & grepl(pattern="^E" ,x=UKla@data$LAD11CD)] <- 0
+Londonla@data$pred[is.na(Londonla@data$pred)] <- 0
+Englandla@data$pred[is.na(Englandla@data$pred)] <- 0
+
+############
+## base:: ##
+############
+## London and England together
+
+BREAKS <- seq(0, 0.7, length.out = 11)
+COLS <- rev(heat.colors(10))
+
+x11()
+par(oma = c(0,0,0,0))
+plot(Englandla, col = COLS[findInterval(Englandla$pred, BREAKS)])
+par(new = TRUE)
+par(oma = c(3,2,1,17))
+plot(Londonla, col = COLS[findInterval(Londonla$pred, BREAKS, rightmost.closed = TRUE)])
+par(oma = c(0,0,0,0))
+image.plot(legend.only = TRUE, col = COLS, breaks = BREAKS, zlim = c(0,1))
+```
+
+```{r NCSP-2013}
+
+out <- data.frame(LAD11NM=CTADGUM_pred$LAD11NM,
+                  pred=as.numeric(CTADGUM_pred$surv2013.1524))   #need to do this cos problem with rownames!! ##TODO##
+
+UKla@data <- left_join(UKla0@data, out, by="LAD11NM")
+Londonla@data <- left_join(Londonla0@data, out, by="LAD11NM")
+Englandla@data <- left_join(Englandla0@data, out, by="LAD11NM")
+
+##TODO##
+## go back and debug why these LAs are missing in the predictions
+UKla@data$pred[is.na(UKla@data$pred) & grepl(pattern="^E" ,x=UKla@data$LAD11CD)] <- 0
+Londonla@data$pred[is.na(Londonla@data$pred)] <- 0
+Englandla@data$pred[is.na(Englandla@data$pred)] <- 0
+
+############
+## base:: ##
+############
+## London and England together
+
+BREAKS <- seq(0, 0.7, length.out = 11)
+COLS <- rev(heat.colors(10))
+
+x11()
+par(oma = c(0,0,0,0))
+plot(Englandla, col = COLS[findInterval(Englandla$pred, BREAKS)])
+par(new = TRUE)
+par(oma = c(3,2,1,17))
+plot(Londonla, col = COLS[findInterval(Londonla$pred, BREAKS, rightmost.closed = TRUE)])
+par(oma = c(0,0,0,0))
+image.plot(legend.only = TRUE, col = COLS, breaks = BREAKS, zlim = c(0,1))
+```
+
+### Indirect standardised ratios
+
+
+```{r indirect_standardised_ratios, eval=FALSE}
+
+out <- data.frame(LAD11NM=CTADGUM_pred$LAD11NM, pred=as.numeric(CTADGUM_pred$ISR_surv2011.1524))   #need to do this cos problem with rownames!!
+
+UKla@data <- left_join(UKla0@data, out, by="LAD11NM")
+Londonla@data <- left_join(Londonla0@data, out, by="LAD11NM")
+
+qtm(UKla, "pred")
+qtm(Londonla, "pred")
+
+##############
+## ggplot:: ##
+##############
+
+UKla.f <- fortify(UKla, region = "LAD11NM")
+UKla.f <- merge(UKla.f, UKla@data, by.x = "id", by.y = "LAD11NM")
+
+map5 <- ggplot(UKla.f, aes(long, lat, group = group, fill = pred)) + geom_polygon()
+
+map5 <- map5 + coord_equal() +
+    labs(x = "", y = "", fill = "Outcome") +
+    ggtitle("") +
+    theme(axis.ticks=element_blank(), axis.text=element_blank()) +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())
+
+## continuous outcomes
+map5 + scale_fill_continuous(low = "yellow", high = "blue") +
+  coord_equal(xlim=c(0, 670000), ylim=c(0, 650000)) # England zoom
+
+# ## discrete outomes
+map <- ggplot(UKla.f, aes(x=long, y=lat, group=group, fill=cut(pred, breaks=seq(0,0.5, by=0.05)))) + geom_polygon()
+map + scale_fill_hue("clarity") + scale_fill_discrete("") + coord_equal() +
+    labs(x = "", y = "", fill = "Outcome") +
+    ggtitle("") +
+    theme(axis.ticks=element_blank(), axis.text=element_blank()) +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+  coord_equal(xlim=c(0, 670000), ylim=c(0, 650000)) 
+```
+
+
+### Quadrants
+
+
+```{r quadrants, eval=TRUE}
+out <- data.frame(LAD11NM=CTADGUM_pred$LAD11NM,
+                  pred=as.numeric(CTADGUM_pred$quadrant_surv2011.1524),
+                  predname=CTADGUM_pred$name.quadrant_surv2011.1524)
+
+UKla@data <- left_join(UKla0@data, out, by="LAD11NM")
+Londonla@data <- left_join(Londonla0@data, out, by="LAD11NM")
+
+qtm(UKla, "predname")
+qtm(Londonla, "predname")
+
+##############
+## ggplot:: ##
+##############
+
+UKla.f <- fortify(UKla, region = "LAD11NM")
+UKla.f <- merge(UKla.f, UKla@data, by.x = "id", by.y = "LAD11NM")
+
+map5 <- ggplot(UKla.f, aes(long, lat, group = group, fill = pred)) + geom_polygon()
+
+map5 <- map5 + coord_equal() +
+    labs(x = "", y = "", fill = "Outcome") +
+    ggtitle("") +
+    theme(axis.ticks=element_blank(), axis.text=element_blank()) +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())
+
+## continuous outcomes
+map5 + scale_fill_continuous(low = "yellow", high = "blue") +
+  coord_equal(xlim=c(0, 670000), ylim=c(0, 650000)) # England zoom
+
+# ## discrete outomes
+map <- ggplot(UKla.f, aes(x=long, y=lat, group=group, fill=cut(pred, breaks=seq(0,0.5, by=0.05)))) + geom_polygon()
+map + scale_fill_hue("clarity") + scale_fill_discrete("") + coord_equal() +
+    labs(x = "", y = "", fill = "Outcome") +
+    ggtitle("") +
+    theme(axis.ticks=element_blank(), axis.text=element_blank()) +
+    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank())+
+  coord_equal(xlim=c(0, 670000), ylim=c(0, 650000)) 
+```
+
+
+### Difference between surveillance and pooled national average
+
+```{r NCSP_2011-national_average}
+
+out <- data.frame(LAD11NM=CTADGUM_pred$LAD11NM,
+                  pred=mean(CTADGUM_pred$surv2011.1624, na.rm=TRUE)-CTADGUM_pred$surv2011.1624)   #need to do this cos problem with rownames!!
+
+UKla@data <- left_join(UKla0@data, out, by="LAD11NM")
+Londonla@data <- left_join(Londonla0@data, out, by="LAD11NM")
+Englandla@data <- left_join(Englandla0@data, out, by="LAD11NM")
+
+##TODO##
+## go back and debug why these LAs are missing in the predictions
+UKla@data$pred[is.na(UKla@data$pred) & grepl(pattern="^E" ,x=UKla@data$LAD11CD)] <- 0
+Londonla@data$pred[is.na(Londonla@data$pred)] <- 0
+Englandla@data$pred[is.na(Englandla@data$pred)] <- 0
+
+UKla@data$LAD11NMgreaterthan <- NA
+UKla@data$LAD11NMgreaterthan[UKla@data$pred<0 & !is.na(UKla@data$pred)] <- UKla@data$LAD11NM[UKla@data$pred<0 & !is.na(UKla@data$pred)]
+Londonla@data$LAD11NMgreaterthan <- NA
+Londonla@data$LAD11NMgreaterthan[Londonla@data$pred<0 & !is.na(Londonla@data$pred)] <- Londonla@data$LAD11NM[Londonla@data$pred<0 & !is.na(Londonla@data$pred)]
+Englandla@data$LAD11NMgreaterthan <- NA
+Englandla@data$LAD11NMgreaterthan[Englandla@data$pred<0 & !is.na(Englandla@data$pred)] <- Englandla@data$LAD11NM[Englandla@data$pred<0 & !is.na(Englandla@data$pred)]
+
+UKla@data <- left_join(UKla@data, la.region.plot.lookup, by = c("LAD11NMgreaterthan"="LA.Name"))
+Londonla@data <- left_join(Londonla@data, la.region.plot.lookup, by = c("LAD11NMgreaterthan"="LA.Name"))
+Englandla@data <- left_join(Englandla@data, la.region.plot.lookup, by = c("LAD11NMgreaterthan"="LA.Name"))
+
+x11()
+qtm(UKla, "pred", fill.title="mean - NCSP 2011",
+    fill.textNA="Scotland and Wales", text="laname.num", text.size=0.5)
+x11()
+qtm(Londonla, "pred", fill.title="mean - NCSP 2011",
+    text="laname.num", text.size=0.5)
+x11()
+qtm(Englandla, "pred", fill.title="mean - NCSP 2011",
+    text="laname.num", text.size=0.5)
+
+############
+## base:: ##
+############
+## London and England together
+
+BREAKS <- seq(-0.4, 0.4, length.out = 9)
+COLS <- rev(heat.colors(8))
+
+x11()
+par(oma = c(0,0,0,0))
+plot(Englandla, col = COLS[findInterval(Englandla$pred, BREAKS)])
+par(new = TRUE)
+par(oma = c(3,2,1,17))
+plot(Londonla, col = COLS[findInterval(Londonla$pred, BREAKS, rightmost.closed = TRUE)])
+par(oma = c(0,0,0,0))
+image.plot(legend.only = TRUE, col = COLS, breaks = BREAKS, zlim = c(0,1))
+```
+
+
+```{r NCSP_2012-national_average}
+
+out <- data.frame(LAD11NM=CTADGUM_pred$LAD11NM,
+                  pred=mean(CTADGUM_pred$surv2012.1634, na.rm=TRUE)-CTADGUM_pred$surv2012.1634)   #need to do this cos problem with rownames!!
+
+UKla@data <- left_join(UKla0@data, out, by="LAD11NM")
+Londonla@data <- left_join(Londonla0@data, out, by="LAD11NM")
+Englandla@data <- left_join(Englandla0@data, out, by="LAD11NM")
+
+##TODO##
+## go back and debug why these LAs are missing in the predictions
+UKla@data$pred[is.na(UKla@data$pred) & grepl(pattern="^E" ,x=UKla@data$LAD11CD)] <- 0
+Londonla@data$pred[is.na(Londonla@data$pred)] <- 0
+Englandla@data$pred[is.na(Englandla@data$pred)] <- 0
+
+UKla@data$LAD11NMgreaterthan <- NA
+UKla@data$LAD11NMgreaterthan[UKla@data$pred<0 & !is.na(UKla@data$pred)] <- UKla@data$LAD11NM[UKla@data$pred<0 & !is.na(UKla@data$pred)]
+Londonla@data$LAD11NMgreaterthan <- NA
+Londonla@data$LAD11NMgreaterthan[Londonla@data$pred<0 & !is.na(Londonla@data$pred)] <- Londonla@data$LAD11NM[Londonla@data$pred<0 & !is.na(Londonla@data$pred)]
+Englandla@data$LAD11NMgreaterthan <- NA
+Englandla@data$LAD11NMgreaterthan[Englandla@data$pred<0 & !is.na(Englandla@data$pred)] <- Englandla@data$LAD11NM[Englandla@data$pred<0 & !is.na(Englandla@data$pred)]
+
+UKla@data <- left_join(UKla@data, la.region.plot.lookup, by = c("LAD11NMgreaterthan"="LA.Name"))
+Londonla@data <- left_join(Londonla@data, la.region.plot.lookup, by = c("LAD11NMgreaterthan"="LA.Name"))
+Englandla@data <- left_join(Englandla@data, la.region.plot.lookup, by = c("LAD11NMgreaterthan"="LA.Name"))
+
+x11()
+qtm(UKla, "pred", fill.title="mean - NCSP 2012",
+    fill.textNA="Scotland and Wales", text="laname.num", text.size=0.5)
+x11()
+qtm(Londonla, "pred", fill.title="mean - NCSP 2012",
+    text="laname.num", text.size=0.5)
+x11()
+qtm(Englandla, "pred", fill.title="mean - NCSP 2012",
+    text="laname.num", text.size=0.5)
+
+############
+## base:: ##
+############
+## London and England together
+
+BREAKS <- seq(-0.4, 0.4, length.out = 9)
+COLS <- rev(heat.colors(8))
+
+x11()
+par(oma = c(0,0,0,0))
+plot(Englandla, col = COLS[findInterval(Englandla$pred, BREAKS)])
+par(new = TRUE)
+par(oma = c(3,2,1,17))
+plot(Londonla, col = COLS[findInterval(Londonla$pred, BREAKS, rightmost.closed = TRUE)])
+par(oma = c(0,0,0,0))
+image.plot(legend.only = TRUE, col = COLS, breaks = BREAKS, zlim = c(0,1))
+```
+
+
+## Posterior Credible Intervals
+
+```{r WinBUGS-99&50-CI_2011}
+
+MCMCcols <- grepl(pattern="^V[1234567890]+", x=names(CTADGUM_pred_WinBUGS))
+
+out <- data.frame(LAD11NM=CTADGUM_pred_WinBUGS$LAD11NM,
+                  ymin99 = apply(CTADGUM_pred_WinBUGS[,MCMCcols], 1, quantile, probs=0.005),
+                  ymax99 = apply(CTADGUM_pred_WinBUGS[,MCMCcols], 1, quantile, probs=0.995),
+                  ymin50 = apply(CTADGUM_pred_WinBUGS[,MCMCcols], 1, quantile, probs=0.25),
+                  ymax50 = apply(CTADGUM_pred_WinBUGS[,MCMCcols], 1, quantile, probs=0.75))
+
+out$CI99 <- as.numeric(CTADGUM_pred_WinBUGS$surv2011.1624 > out$ymax99) - as.numeric(CTADGUM_pred_WinBUGS$surv2011.1624 < out$ymin99)
+out$CI50 <- as.numeric(CTADGUM_pred_WinBUGS$surv2011.1624 > out$ymax50) - as.numeric(CTADGUM_pred_WinBUGS$surv2011.1624 < out$ymin50)
+
+out$CI99 <- as.factor(ifelse(out$CI99==1, "NCSP > MRP", ifelse(out$CI99==-1, "NCSP < MRP", "Within CI")))
+out$CI50 <- as.factor(ifelse(out$CI50==1, "NCSP > MRP", ifelse(out$CI50==-1, "NCSP < MRP", "Within CI")))
+                      
+UKla@data <- left_join(UKla0@data, out, by="LAD11NM")
+Londonla@data <- left_join(Londonla0@data, out, by="LAD11NM")
+Englandla@data <- left_join(Englandla0@data, out, by="LAD11NM")
+
+# ##TODO##
+# ## go back and debug why these LAs are missing in the predictions
+UKla@data$CI99[is.na(UKla@data$CI99) & grepl(pattern="^E" , x=UKla@data$LAD11CD)] <- "NCSP < MRP"
+UKla@data$CI50[is.na(UKla@data$CI50) & grepl(pattern="^E" , x=UKla@data$LAD11CD)] <- "NCSP < MRP"
+Londonla@data$CI99[is.na(Londonla@data$CI99)] <- "NCSP < MRP"
+Londonla@data$CI50[is.na(Londonla@data$CI50)] <- "NCSP < MRP"
+Englandla@data$CI99[is.na(Englandla@data$CI99)] <- "NCSP < MRP"
+Englandla@data$CI50[is.na(Englandla@data$CI50)] <- "NCSP < MRP"
+
+# 
+# UKla@data$LAD11NMgreaterthan <- NA
+# UKla@data$LAD11NMgreaterthan[UKla@data$pred<0 & !is.na(UKla@data$pred)] <- UKla@data$LAD11NM[UKla@data$pred<0 & !is.na(UKla@data$pred)]
+# Londonla@data$LAD11NMgreaterthan <- NA
+# Londonla@data$LAD11NMgreaterthan[Londonla@data$pred<0 & !is.na(Londonla@data$pred)] <- Londonla@data$LAD11NM[Londonla@data$pred<0 & !is.na(Londonla@data$pred)]
+
+# UKla@data <- left_join(UKla@data, la.region.plot.lookup, by = c("LAD11NMgreaterthan"="LA.Name"))
+# Londonla@data <- left_join(Londonla@data, la.region.plot.lookup, by = c("LAD11NMgreaterthan"="LA.Name"))
+
+x11()
+qtm(UKla, "CI99", fill.title="Outside 99%\n Credible Interval",
+    fill.textNA="Scotland and Wales")
+x11()
+qtm(Londonla, "CI99", fill.title="Outside 99%\n Credible Interval")
+
+x11()
+qtm(UKla, "CI50", fill.title="Outside 50%\n Credible Interval",
+    fill.textNA="Scotland and Wales")
+x11()
+qtm(Londonla, "CI50", fill.title="Outside 50%\n Credible Interval")
+
+x11()
+qtm(Englandla, "CI50", fill.title="Outside 50%\n Credible Interval",
+    fill.textNA="Scotland and Wales")
+x11()
+qtm(Englandla, "CI99", fill.title="Outside 99%\n Credible Interval",
+    fill.textNA="Scotland and Wales")
+
+############
+## base:: ##
+############
+## London and England together
+### 99% CI
+
+library(RColorBrewer)
+COLS <- brewer.pal(n = 3, name = "Accent")
+
+x11()
+par(oma = c(0,0,0,0))
+plot(Englandla, col = COLS[Englandla$CI99])
+par(new = TRUE)
+par(oma = c(3,2,1,17))
+plot(Londonla, col = COLS[Londonla$CI99])
+par(oma = c(0,0,0,0))
+par(new = TRUE)
+legend("topleft", legend=levels(Englandla$CI99), fill=COLS, bty="n")
+
+### 50% CI
+
+x11()
+par(oma = c(0,0,0,0))
+plot(Englandla, col = COLS[Englandla$CI50])
+par(new = TRUE)
+par(oma = c(3,2,1,17))
+plot(Londonla, col = COLS[Londonla$CI50])
+par(oma = c(0,0,0,0))
+par(new = TRUE)
+legend("topleft", legend=levels(Englandla$CI50), fill=COLS, bty="n")
+```
+
+
+
+
+

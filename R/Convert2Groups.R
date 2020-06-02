@@ -4,6 +4,7 @@
 #' @param age (integer)
 #'
 #' @return character strings of categories
+#' @export
 #'
 #' @examples
 #'
@@ -23,6 +24,7 @@ convertAge2ageGroup <- function(age){
 #' @param age (integer)
 #'
 #' @return character strings of categories
+#' @export
 #'
 #' @examples
 #'
@@ -42,6 +44,7 @@ convertAge2ageGroup2 <- function(age){
 #' @param income (integer)
 #'
 #' @return character strings of categories
+#' @export
 #'
 #' @examples
 #'
@@ -62,6 +65,7 @@ convertIncome2incomeGroup <- function(income){
 #' @param breaks
 #'
 #' @return character strings of categories
+#' @export
 #'
 #' @examples
 #'

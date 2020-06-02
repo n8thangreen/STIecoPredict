@@ -1,0 +1,45 @@
+
+    model
+    {
+
+    # Hyperpriors
+    tau.age ~ dgamma(0.001, 0.001)
+    tau.ethngrp ~ dgamma(0.001, 0.001)
+    tau.la ~ dgamma(0.001, 0.001)
+    tau.ons ~ dgamma(0.001, 0.001)
+    tau.b ~ dgamma(0.001, 0.001)
+
+    # Priors
+    alpha ~ dunif(-2,1)
+    b.male ~ dunif(-2,1)
+    b.student ~ dunif(-2,1)
+    b.london ~ dunif(-2,2)
+
+    # Likelihood
+    for(i in 1:n) {
+
+        b[i] ~ dnorm(0, tau.b)
+        cttestly[i] ~ dbin(p[i], N)
+        logit(p[i]) <- alpha + b.male*male[i] + b.student*student[i] +
+                        v[age[i]] + w[ethgrp[i]] + r[la_factor[i]] + b.london*LAlondon[la_factor[i]] + b[i]
+    }
+    # age
+    for(k in 1:K) {
+        v[k] ~ dnorm(0, tau.age)
+    }
+    # ethnic group
+    for(l in 1:L) {
+        w[l] ~ dnorm(0, tau.ethngrp)
+    }
+    # LA
+    for(s in 1:S) {
+        r[s] ~ dnorm(r.hat[s], tau.la)
+        r.hat[s] <- u[UrbRur[s]]
+    }
+    # ONS urban-rural classification
+    for(j in 1:J) {
+        u[j] ~ dnorm(0, tau.ons)
+    }
+
+    }
+    

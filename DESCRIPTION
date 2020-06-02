@@ -1,10 +1,14 @@
 Package: STIecoPredict
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Multilevel Regression With Post-Stratification Using Natsal Data
 Version: 0.1
 Date: 2015-06-23
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
+Author: N Green
+Maintainer: <nathan.green@imperial.ac.uk>
 Description: More about what it does (maybe more than one line)
-License: What license is it under?
+License: NA
 LazyData: TRUE
+RoxygenNote: 6.0.1
+Suggests: knitr,
+    rmarkdown
+VignetteBuilder: knitr

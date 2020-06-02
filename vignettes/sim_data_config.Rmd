@@ -76,10 +76,10 @@ incomeLA.dat[["Women"]]$LA_Name <- LAnameClean(str_trim(incomeLA.dat[["Women"]]$
 # ethnicityLA.dat$Area <- LAnameClean(ethnicityLA.dat$Area)
 ethnicityLA.dat <- list()
 
-ethnicityLA.dat[["Men"]] <- read.csv("C:/Users/ngreen1/Dropbox/small-area & chlamydia/R_code/packages/STIecoPredict/raw-data/census2011_LA_ethgrp_agegrp_male.csv", check.names=FALSE)
+ethnicityLA.dat[["Men"]] <- read.csv("raw-data/census2011_LA_ethgrp_agegrp_male.csv", check.names=FALSE)
 # ethnicityLA.dat[["Men"]]   <- read.csv("./risk_factors/ethnicity/census2011_LA_ethgrp_agegrp_male.csv", check.names=FALSE)
 
-ethnicityLA.dat[["Women"]] <- read.csv("C:/Users/ngreen1/Dropbox/small-area & chlamydia/R_code/packages/STIecoPredict/raw-data/census2011_LA_ethgrp_agegrp_female.csv", check.names=FALSE)
+ethnicityLA.dat[["Women"]] <- read.csv("raw-data/census2011_LA_ethgrp_agegrp_female.csv", check.names=FALSE)
 # ethnicityLA.dat[["Women"]] <- read.csv("./risk_factors/ethnicity/census2011_LA_ethgrp_agegrp_female.csv", check.names=FALSE)
 ```
 

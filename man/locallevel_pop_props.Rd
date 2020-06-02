@@ -4,7 +4,10 @@
 \alias{locallevel_pop_props}
 \title{Estimate Local Level Population Proportions}
 \usage{
-locallevel_pop_props(ageRange)
+locallevel_pop_props(ageRange = 16:24)
+}
+\arguments{
+\item{ageRange}{Integer sequence of subset of age, which the probability of belonging to will sum to 1.}
 }
 \value{
 list by each LA
@@ -21,9 +24,8 @@ Input data is in \code{data(pop_sim_input)} in \code{STIecoPredict} package.
 }
 \examples{
 data("locallevel_pop_input")
-res <- locallevel_pop_props()
+sim_prop <- locallevel_pop_props()
 }
 \seealso{
 \code{\link{locallevel_pop_sim}}
 }
-

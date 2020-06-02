@@ -1,0 +1,235 @@
+---
+title: MRP script of LA-level chlaymdia coverage analysis using WinBUGS
+author: N Green
+date: 13-05-2016
+output: word_document
+---
+
+This document takes the results of the Bayesian hierarchical model fitting using the Natsal-3 data and WinBUGS to then perform post-stratification to estimate the LA level chlamydia coverage in the previous year.
+
+There's an equivalent script for do this with the `glmer` function for classical (non-Bayesian) regression which is much faster to fit.
+
+
+```{r preamble}
+library(lme4)
+library(car)
+library(arm)
+library(pander)
+library(knitr)
+library(stargazer)
+library(xtable)
+library(lattice)
+library(plyr)
+library(STIecoPredict)
+library(R2WinBUGS)
+library(coda)
+
+# load("C:/Users/ngreen1/Dropbox/small-area & chlamydia/R_code/scripts/mrp/data/cleaned-regn-input-mrpNatsal.RData")
+load("./data/cleaned-regn-input-mrpNatsal.RData")
+```
+
+```{r load_data}
+Natsal0 <- Natsal
+
+load("../WinBUGS/WinBUGS_with-all_LA-vars/outmat.RData")
+
+savedata <- FALSE
+
+nsample <- nrow(outmat)
+```
+
+```{r eval=FALSE}
+## raw WinBUGS output
+coda1.file <- "../WinBUGS/WinBUGS_with-all_LA-vars/coda1.txt"
+coda2.file <- "../WinBUGS/WinBUGS_with-all_LA-vars/coda2.txt"
+coda3.file <- "../WinBUGS/WinBUGS_with-all_LA-vars/coda3.txt"
+outmcmc <- read.bugs(c(coda1.file, coda2.file, coda3.file))
+```
+
+
+```{r posterior_summary}
+posterior.summary <- as.data.frame(t(apply(outmat, 2, quantile, probs=c(0.025,0.25,0.75,0.975) )))
+posterior.summary$variable <- rownames(posterior.summary)
+# posterior.summary <- posterior.summary[posterior.summary$variable!="deviance",]
+
+posterior.means <- apply(outmat, 2, mean)
+names(posterior.means) <- toupper(names(outmat))
+```
+
+
+Because some of the LAs don't have any sample point we create a vector of LA random effects that includes these. We set these REs to 0.
+Could alternatively take e.g. average of neighbours instead.
+
+```{r fillin_missingLAs}
+missingLAnames <- names(posterior.means)[!levels(sim_prop_la$LAname)%in%names(posterior.means)]
+missingLAs <- rep(0,length(missingLAnames))
+names(missingLAs) <- missingLAnames
+
+#ad-hoc!
+posterior.means <- c(posterior.means,
+                     c("CHRISTCHURCH"=0, "MALDON"=0, "ROCHFORD"=0, "UTTLESFORD"=0, "WATFORD"=0, "RIBBLE VALLEY"=0, "RICHMONDSHIRE"=0, "CHERWELL"=0, "NORTH WARWICKSHIRE"=0))
+
+posterior.means <- c(posterior.means, missingLAs)
+posterior.means <- c(posterior.means, `15`=as.numeric(posterior.means["16"]))
+```
+
+
+# Append predictions to joint distribution dataset
+
+```{r classif_probs}
+
+fixeff.formula <- as.formula("cttestly ~ student + sex + age + ethnic2")
+
+## census data
+# test.calcTotalProbs(sim_prop_la)
+sim_prop_la <- STIecoPredict:::calcTotalProbs(formula=fixeff.formula, data=sim_prop_la, extracols = c("LAname","gor"))
+
+## select chunks appropriate for given model
+pred <- arm::invlogit(
+                    posterior.means["ALPHA"] +
+                     
+                    posterior.means["B.MALE"]*(sim_prop_la$sex=="Men") +
+                 
+                    posterior.means["B.STUDENT"]*(sim_prop_la$student) +
+                 
+                    posterior.means[as.character(sim_prop_la$ethnic2)] +
+
+                    posterior.means[as.character(sim_prop_la$age)] +
+                      
+                    posterior.means[as.character(sim_prop_la$LAname)]
+                   )
+```
+
+```{r weight_and_sum}
+## weight the probabilities by the subpopulation sizes and then sum by LA
+
+predweighted <- pred * sim_prop_la$totalprob
+LApred <- tapply(predweighted, sim_prop_la$LAname, sum, na.rm=TRUE)
+```
+
+The LA specific post-stratified estimates are then
+
+```{r LA_predictions}
+(LApred <- data.frame(LApred=LApred[order(LApred)]))
+```
+
+
+## Re-adjust for conditioning of ages between 16-24 only
+
+```{r}
+# popCensus <- read.csv("..\\..\\packages\\STIecoPredict\\raw-data\\popCensus.csv")
+LApred$LAname <- rownames(LApred)
+popCensus$LAname <- STIecoPredict:::LAnameClean(popCensus$LAname)
+rownames(LApred) <- NULL
+LApred <- merge(LApred, popCensus[popCensus$Sex=="All", c("LAname","prob.25.and.over")], all.x=TRUE)
+LApred$LApred.adj <- LApred$LApred*(1-LApred$prob.25.and.over)
+```
+
+
+```{r, eval=savedata}
+save(pred, LApred, file="data/predictions.RData")
+```
+
+```{r direct_estimates_la}
+library(reshape2)
+agerange <- 15:24
+NatsalLA <- melt(tapply(Natsal$cttestly[Natsal$age%in%agerange], Natsal$laname[Natsal$age%in%agerange], mean), varnames = c("LA Name"))
+NatsalLAsize <- melt(tapply(Natsal$cttestly[Natsal$age%in%agerange], Natsal$laname[Natsal$age%in%agerange], length), varnames = c("LA Name"))
+```
+
+
+## Surveillance data
+
+Combine predictions with the surveillance data and produce summary statistics for each area.
+
+```{r all_joined_output}
+CTADGUM_pred <- STIecoPredict:::joinAllOutcomeData(pred=LApred)
+CTADGUM_pred <- STIecoPredict:::calcStats.CTADGUM_pred(CTADGUM_pred)
+```
+
+```{r eval=savedata}
+save(CTADGUM_pred, file="data/CTADGUM_pred.RData")
+```
+
+```{r Natsal_surveillance_joins}
+CTADGUM_pred <- merge(CTADGUM_pred, NatsalLA[,c("LA Name", "value")], by="LA Name", all.x=TRUE)
+CTADGUM_pred <- merge(CTADGUM_pred, NatsalLAsize[,c("LA Name", "value")], by="LA Name", all.x=TRUE)
+names(CTADGUM_pred)[names(CTADGUM_pred)%in%c("value.x", "value.y")] <- c("NatsalLA", "NatsalLAsize")
+```
+
+
+### Propogate the posterior uncertainty
+
+```{r fillin_missingLAs}
+missingLAs <- as.data.frame(matrix(0, nrow = nsample, ncol = length(missingLAnames)))
+names(missingLAs) <- missingLAnames
+outmat <- cbind(outmat, missingLAs)
+
+#ad-hoc!
+outmat <- data.frame(outmat,
+            cbind("CHRISTCHURCH"=rep(0,nsample), "MALDON"=rep(0,nsample), "ROCHFORD"=rep(0,nsample), "UTTLESFORD"=rep(0,nsample), "WATFORD"=rep(0,nsample), "RIBBLE VALLEY"=rep(0,nsample), "RICHMONDSHIRE"=rep(0,nsample), "CHERWELL"=rep(0,nsample), "NORTH WARWICKSHIRE"=rep(0,nsample)), check.names = FALSE)
+
+names(outmat) <- toupper(names(outmat))
+predmat <- matrix(NA, ncol = nsample, nrow = nrow(sim_prop_la))
+```
+
+
+```{r classif_probs_vector, eval=FALSE}
+for (i in 1:nsample){
+  
+predmat[i,] <- arm::invlogit(
+                    outmat[i,"ALPHA"] +
+                     
+                    outmat[i, "B.MALE"]*(sim_prop_la$sex=="Men") +
+                 
+                    outmat[i, "B.STUDENT"]*(sim_prop_la$student) +
+                 
+                    outmat[i, as.character(sim_prop_la$ethnic2)] +
+
+                    outmat[i, as.character(sim_prop_la$age)] +
+                      
+                    outmat[i, as.character(sim_prop_la$LAname)]
+                   )
+}
+```
+
+
+```{r classif_probs_datatables, eval=TRUE}
+library(data.table)
+
+outmelt <- melt(data.frame(sample=1:nsample,outmat), id.vars="sample")
+DT <- data.table(outmelt)
+setkeyv(DT, cols=c("sample","variable"))
+
+#<3 mins
+#covariates x sample
+for (i in 1:nsample){
+  
+predmat[,i] <- arm::invlogit(
+  
+  DT[list(i,"ALPHA")]$value +
+  DT[list(i,"B.MALE")]$value *(sim_prop_la$sex=="Men") +
+  DT[list(i,"B.STUDENT")]$value *(sim_prop_la$student) +
+    
+  DT[list(i, make.names(sim_prop_la$ethnic2))]$value +
+  DT[list(i, make.names(sim_prop_la$age))]$value +
+  DT[list(i, make.names(sim_prop_la$LAname))]$value)
+}
+
+save(predmat, file="all_combinations_posterior_sample.RData")
+```
+
+
+```{r}
+## weight the probabilities by the subpopulation sizes and then sum by LA
+
+predweighted <- sweep(predmat, MARGIN=1, sim_prop_la$totalprob, `*`)
+LApred <- aggregate(predweighted ~ sim_prop_la$LAname, FUN = sum)
+```
+
+```{r eval=FALSE}
+CTADGUM_pred <- STIecoPredict:::joinAllOutcomeData(pred=LApred)
+CTADGUM_pred <- STIecoPredict:::calcStats.CTADGUM_pred(CTADGUM_pred)
+```
+
+

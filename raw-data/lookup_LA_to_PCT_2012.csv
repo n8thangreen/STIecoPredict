@@ -1,0 +1,341 @@
+LAD12CD,LAD12CDO,LAD12NM,PCO12CD,PCO12CDO,PCO12NM
+E09000001,00AA,City of London,E16000010,5C3,City and Hackney Teaching
+E09000002,00AB,Barking and Dagenham,E16000009,5C2,Barking and Dagenham
+E09000003,00AC,Barnet,E16000006,5A9,Barnet
+E09000004,00AD,Bexley,E17000002,TAK,Bexley
+E09000005,00AE,Brent,E16000045,5K5,Brent Teaching
+E09000006,00AF,Bromley,E16000004,5A7,Bromley
+E09000007,00AG,Camden,E16000047,5K7,Camden
+E09000008,00AH,Croydon,E16000049,5K9,Croydon
+E09000009,00AJ,Ealing,E16000035,5HX,Ealing
+E09000010,00AK,Enfield,E16000008,5C1,Enfield
+E09000011,00AL,Greenwich,E16000005,5A8,Greenwich Teaching
+E09000012,00AM,Hackney,E16000010,5C3,City and Hackney Teaching
+E09000013,00AN,Hammersmith and Fulham,E16000030,5H1,Hammersmith and Fulham
+E09000014,00AP,Haringey,E16000013,5C9,Haringey Teaching
+E09000015,00AQ,Harrow,E16000046,5K6,Harrow
+E09000016,00AR,Havering,E16000002,5A4,Havering
+E09000017,00AS,Hillingdon,E16000007,5AT,Hillingdon
+E09000018,00AT,Hounslow,E16000036,5HY,Hounslow
+E09000019,00AU,Islington,E16000048,5K8,Islington
+E09000020,00AW,Kensington and Chelsea,E16000056,5LA,Kensington and Chelsea
+E09000021,00AX,Kingston upon Thames,E16000003,5A5,Kingston
+E09000022,00AY,Lambeth,E16000058,5LD,Lambeth
+E09000023,00AZ,Lewisham,E16000060,5LF,Lewisham
+E09000024,00BA,Merton,E16000068,5M7,Sutton and Merton
+E09000025,00BB,Newham,E16000012,5C5,Newham
+E09000026,00BC,Redbridge,E16000083,5NA,Redbridge
+E09000027,00BD,Richmond upon Thames,E16000067,5M6,Richmond and Twickenham
+E09000028,00BE,Southwark,E16000059,5LE,Southwark
+E09000029,00BF,Sutton,E16000068,5M7,Sutton and Merton
+E09000030,00BG,Tower Hamlets,E16000011,5C4,Tower Hamlets
+E09000031,00BH,Waltham Forest,E16000084,5NC,Waltham Forest
+E09000032,00BJ,Wandsworth,E16000061,5LG,Wandsworth
+E09000033,00BK,Westminster,E16000057,5LC,Westminster
+E08000001,00BL,Bolton,E16000148,5HQ,Bolton Teaching
+E08000002,00BM,Bury,E16000043,5JX,Bury
+E08000003,00BN,Manchester,E16000149,5NT,Manchester Teaching
+E08000004,00BP,Oldham,E16000039,5J5,Oldham
+E08000005,00BQ,Rochdale,E16000096,5NQ,"Heywood, Middleton and Rochdale"
+E08000006,00BR,Salford,E16000025,5F5,Salford
+E08000007,00BS,Stockport,E16000026,5F7,Stockport
+E08000008,00BT,Tameside,E16000062,5LH,Tameside and Glossop
+E08000009,00BU,Trafford,E16000097,5NR,Trafford
+E08000010,00BW,Wigan,E16000032,5HG,"Ashton, Leigh and Wigan"
+E08000011,00BX,Knowsley,E16000038,5J4,Knowsley
+E08000012,00BY,Liverpool,E16000092,5NL,Liverpool
+E08000013,00BZ,St. Helens,E16000093,5NM,Halton and St Helens
+E08000014,00CA,Sefton,E16000090,5NJ,Sefton
+E08000015,00CB,Wirral,E16000091,5NK,Wirral
+E08000016,00CC,Barnsley,E16000042,5JE,Barnsley
+E08000017,00CE,Doncaster,E16000078,5N5,Doncaster
+E08000018,00CF,Rotherham,E16000031,5H8,Rotherham
+E08000019,00CG,Sheffield,E16000077,5N4,Sheffield
+E08000020,00CH,Gateshead,E16000050,5KF,Gateshead
+E08000021,00CJ,Newcastle upon Tyne,E16000017,5D7,Newcastle
+E08000022,00CK,North Tyneside,E16000018,5D8,North Tyneside
+E08000023,00CL,South Tyneside,E16000051,5KG,South Tyneside
+E08000024,00CM,Sunderland,E16000052,5KL,Sunderland Teaching
+E08000025,00CN,Birmingham,E16000064,5M1,South Birmingham
+E08000025,00CN,Birmingham,E16000073,5MX,Heart of Birmingham Teaching
+E08000025,00CN,Birmingham,E16000117,5PG,Birmingham East and North
+E08000026,00CQ,Coventry,E16000070,5MD,Coventry Teaching
+E08000027,00CR,Dudley,E16000115,5PE,Dudley
+E08000028,00CS,Sandwell,E16000116,5PF,Sandwell
+E08000029,00CT,Solihull,E16000151,5QW,Solihull
+E08000030,00CU,Walsall,E16000066,5M3,Walsall Teaching
+E08000031,00CW,Wolverhampton,E16000072,5MV,Wolverhampton City
+E08000032,00CX,Bradford,E16000102,5NY,Bradford and Airedale Teaching
+E08000033,00CY,Calderdale,E16000040,5J6,Calderdale
+E08000034,00CZ,Kirklees,E16000075,5N2,Kirklees
+E08000035,00DA,Leeds,E16000074,5N1,Leeds
+E08000036,00DB,Wakefield,E16000076,5N3,Wakefield District
+E06000001,00EB,Hartlepool,E16000019,5D9,Hartlepool
+E06000002,00EC,Middlesbrough,E16000053,5KM,Middlesbrough
+E06000003,00EE,Redcar and Cleveland,E16000146,5QR,Redcar and Cleveland
+E06000004,00EF,Stockton-on-Tees,E16000020,5.00E+01,Stockton-on-Tees Teaching
+E06000005,00EH,Darlington,E16000041,5J9,Darlington
+E06000047,00EJ,County Durham,E16000085,5ND,County Durham
+E06000048,00EM,Northumberland,E17000001,TAC,Northumberland
+E06000049,00EQ,Cheshire East,E16000094,5NN,Western Cheshire
+E06000049,00EQ,Cheshire East,E16000095,5NP,Central and Eastern Cheshire
+E06000006,00ET,Halton,E16000093,5NM,Halton and St Helens
+E06000007,00EU,Warrington,E16000037,5J2,Warrington
+E06000050,00EW,Cheshire West and Chester,E16000094,5NN,Western Cheshire
+E06000050,00EW,Cheshire West and Chester,E16000095,5NP,Central and Eastern Cheshire
+E06000008,00EX,Blackburn with Darwen,E17000006,TAP,Blackburn with Darwen Teaching
+E06000009,00EY,Blackpool,E16000033,5HP,Blackpool
+E06000010,00FA,"Kingston upon Hull, City of",E16000101,5NX,Hull Teaching
+E06000011,00FB,East Riding of Yorkshire,E16000100,5NW,East Riding of Yorkshire
+E06000012,00FC,North East Lincolnshire,E17000005,TAN,North East Lincolnshire
+E06000013,00FD,North Lincolnshire,E16000021,5EF,North Lincolnshire
+E06000013,00FD,North Lincolnshire,E16000082,5N9,Lincolnshire Teaching
+E06000013,00FD,North Lincolnshire,E17000005,TAN,North East Lincolnshire
+E06000014,00FF,York,E16000099,5NV,North Yorkshire and York
+E06000015,00FK,Derby,E16000080,5N7,Derby City
+E06000016,00FN,Leicester,E16000113,5PC,Leicester City
+E06000017,00FP,Rutland,E16000112,5PA,Leicestershire County and Rutland
+E06000018,00FY,Nottingham,E16000022,5EM,Nottingham City
+E06000019,00GA,"Herefordshire, County of",E16000015,5CN,Herefordshire
+E06000020,00GF,Telford and Wrekin,E16000071,5MK,Telford and Wrekin
+E06000051,00GG,Shropshire,E16000065,5M2,Shropshire County
+E06000021,00GL,Stoke-on-Trent,E16000119,5PJ,Stoke on Trent
+E06000022,00HA,Bath and North East Somerset,E16000028,5FL,Bath and North East Somerset
+E06000023,00HB,"Bristol, City of",E16000139,5QJ,Bristol
+E06000024,00HC,North Somerset,E16000069,5M8,North Somerset
+E06000025,00HD,South Gloucestershire,E16000001,5A3,South Gloucestershire
+E06000052,00HE,Cornwall,E16000144,5QP,Cornwall and Isles of Scilly
+E06000053,00HF,Isles of Scilly,E16000144,5QP,Cornwall and Isles of Scilly
+E06000026,00HG,Plymouth,E16000024,5F1,Plymouth Teaching
+E06000027,00HH,Torbay,E17000003,TAL,Torbay
+E06000028,00HN,Bournemouth,E16000143,5QN,Bournemouth and Poole Teaching
+E06000029,00HP,Poole,E16000143,5QN,Bournemouth and Poole Teaching
+E06000030,00HX,Swindon,E16000044,5K3,Swindon
+E06000054,00HY,Wiltshire,E16000140,5QK,Wiltshire
+E06000031,00JA,Peterborough,E16000123,5PN,Peterborough
+E06000032,00KA,Luton,E16000029,5GC,Luton
+E06000055,00KB,Bedford,E16000104,5P2,Bedfordshire
+E06000056,00KC,Central Bedfordshire,E16000104,5P2,Bedfordshire
+E06000033,00KF,Southend-on-Sea,E16000103,5P1,South East Essex
+E06000034,00KG,Thurrock,E16000131,5PY,South West Essex
+E06000035,00LC,Medway,E16000055,5L3,Medway
+E06000036,00MA,Bracknell Forest,E16000137,5QG,Berkshire East
+E06000037,00MB,West Berkshire,E16000136,5QF,Berkshire West
+E06000038,00MC,Reading,E16000136,5QF,Berkshire West
+E06000039,00MD,Slough,E16000137,5QG,Berkshire East
+E06000040,00ME,Windsor and Maidenhead,E16000137,5QG,Berkshire East
+E06000041,00MF,Wokingham,E16000136,5QF,Berkshire West
+E06000042,00MG,Milton Keynes,E16000016,5CQ,Milton Keynes
+E06000043,00ML,Brighton and Hove,E16000063,5LQ,Brighton and Hove City
+E06000044,00MR,Portsmouth,E16000027,5FE,Portsmouth City Teaching
+E06000045,00MS,Southampton,E16000054,5L1,Southampton City
+E06000046,00MW,Isle of Wight,E16000147,5QT,Isle of Wight National Health Service
+E07000004,11UB,Aylesbury Vale,E16000016,5CQ,Milton Keynes
+E07000004,11UB,Aylesbury Vale,E16000134,5QD,Buckinghamshire
+E07000005,11UC,Chiltern,E16000134,5QD,Buckinghamshire
+E07000006,11UE,South Bucks,E16000134,5QD,Buckinghamshire
+E07000007,11UF,Wycombe,E16000134,5QD,Buckinghamshire
+E07000008,12UB,Cambridge,E16000124,5PP,Cambridgeshire
+E07000009,12UC,East Cambridgeshire,E16000124,5PP,Cambridgeshire
+E07000010,12UD,Fenland,E16000124,5PP,Cambridgeshire
+E07000011,12UE,Huntingdonshire,E16000124,5PP,Cambridgeshire
+E07000012,12UG,South Cambridgeshire,E16000124,5PP,Cambridgeshire
+E07000026,16UB,Allerdale,E16000086,5NE,Cumbria Teaching
+E07000027,16UC,Barrow-in-Furness,E16000086,5NE,Cumbria Teaching
+E07000028,16UD,Carlisle,E16000086,5NE,Cumbria Teaching
+E07000029,16UE,Copeland,E16000086,5NE,Cumbria Teaching
+E07000030,16UF,Eden,E16000086,5NE,Cumbria Teaching
+E07000031,16UG,South Lakeland,E16000086,5NE,Cumbria Teaching
+E07000032,17UB,Amber Valley,E16000079,5N6,Derbyshire County
+E07000033,17UC,Bolsover,E16000079,5N6,Derbyshire County
+E07000034,17UD,Chesterfield,E16000079,5N6,Derbyshire County
+E07000035,17UF,Derbyshire Dales,E16000079,5N6,Derbyshire County
+E07000036,17UG,Erewash,E16000079,5N6,Derbyshire County
+E07000037,17UH,High Peak,E16000062,5LH,Tameside and Glossop
+E07000037,17UH,High Peak,E16000079,5N6,Derbyshire County
+E07000038,17UJ,North East Derbyshire,E16000079,5N6,Derbyshire County
+E07000039,17UK,South Derbyshire,E16000079,5N6,Derbyshire County
+E07000040,18UB,East Devon,E16000145,5QQ,Devon
+E07000041,18UC,Exeter,E16000145,5QQ,Devon
+E07000042,18UD,Mid Devon,E16000145,5QQ,Devon
+E07000043,18UE,North Devon,E16000145,5QQ,Devon
+E07000044,18UG,South Hams,E16000145,5QQ,Devon
+E07000045,18UH,Teignbridge,E16000145,5QQ,Devon
+E07000046,18UK,Torridge,E16000145,5QQ,Devon
+E07000047,18UL,West Devon,E16000145,5QQ,Devon
+E07000048,19UC,Christchurch,E16000142,5QM,Dorset
+E07000049,19UD,East Dorset,E16000142,5QM,Dorset
+E07000050,19UE,North Dorset,E16000142,5QM,Dorset
+E07000051,19UG,Purbeck,E16000142,5QM,Dorset
+E07000052,19UH,West Dorset,E16000142,5QM,Dorset
+E07000053,19UJ,Weymouth and Portland,E16000142,5QM,Dorset
+E07000061,21UC,Eastbourne,E16000109,5P7,East Sussex Downs and Weald
+E07000062,21UD,Hastings,E16000110,5P8,Hastings and Rother
+E07000063,21UF,Lewes,E16000109,5P7,East Sussex Downs and Weald
+E07000064,21UG,Rother,E16000110,5P8,Hastings and Rother
+E07000065,21UH,Wealden,E16000109,5P7,East Sussex Downs and Weald
+E07000065,21UH,Wealden,E16000110,5P8,Hastings and Rother
+E07000066,22UB,Basildon,E16000131,5PY,South West Essex
+E07000067,22UC,Braintree,E16000128,5PV,West Essex
+E07000067,22UC,Braintree,E16000130,5PX,Mid Essex
+E07000068,22UD,Brentwood,E16000131,5PY,South West Essex
+E07000069,22UE,Castle Point,E16000103,5P1,South East Essex
+E07000070,22UF,Chelmsford,E16000130,5PX,Mid Essex
+E07000071,22UG,Colchester,E16000129,5PW,North East Essex
+E07000072,22UH,Epping Forest,E16000128,5PV,West Essex
+E07000073,22UJ,Harlow,E16000128,5PV,West Essex
+E07000074,22UK,Maldon,E16000130,5PX,Mid Essex
+E07000075,22UL,Rochford,E16000103,5P1,South East Essex
+E07000076,22UN,Tendring,E16000129,5PW,North East Essex
+E07000077,22UQ,Uttlesford,E16000128,5PV,West Essex
+E07000078,23UB,Cheltenham,E16000138,5QH,Gloucestershire
+E07000079,23UC,Cotswold,E16000138,5QH,Gloucestershire
+E07000080,23UD,Forest of Dean,E16000138,5QH,Gloucestershire
+E07000081,23UE,Gloucester,E16000138,5QH,Gloucestershire
+E07000082,23UF,Stroud,E16000138,5QH,Gloucestershire
+E07000083,23UG,Tewkesbury,E16000138,5QH,Gloucestershire
+E07000084,24UB,Basingstoke and Deane,E16000133,5QC,Hampshire
+E07000085,24UC,East Hampshire,E16000133,5QC,Hampshire
+E07000086,24UD,Eastleigh,E16000133,5QC,Hampshire
+E07000087,24UE,Fareham,E16000133,5QC,Hampshire
+E07000088,24UF,Gosport,E16000133,5QC,Hampshire
+E07000089,24UG,Hart,E16000133,5QC,Hampshire
+E07000090,24UH,Havant,E16000133,5QC,Hampshire
+E07000091,24UJ,New Forest,E16000133,5QC,Hampshire
+E07000092,24UL,Rushmoor,E16000133,5QC,Hampshire
+E07000093,24UN,Test Valley,E16000133,5QC,Hampshire
+E07000094,24UP,Winchester,E16000133,5QC,Hampshire
+E07000095,26UB,Broxbourne,E16000150,5QV,Hertfordshire
+E07000096,26UC,Dacorum,E16000150,5QV,Hertfordshire
+E07000097,26UD,East Hertfordshire,E16000150,5QV,Hertfordshire
+E07000098,26UE,Hertsmere,E16000150,5QV,Hertfordshire
+E07000099,26UF,North Hertfordshire,E16000150,5QV,Hertfordshire
+E07000240,26UG,St Albans,E16000150,5QV,Hertfordshire
+E07000101,26UH,Stevenage,E16000150,5QV,Hertfordshire
+E07000102,26UJ,Three Rivers,E16000150,5QV,Hertfordshire
+E07000103,26UK,Watford,E16000150,5QV,Hertfordshire
+E07000241,26UL,Welwyn Hatfield,E16000150,5QV,Hertfordshire
+E07000105,29UB,Ashford,E16000132,5QA,Eastern and Coastal Kent
+E07000106,29UC,Canterbury,E16000132,5QA,Eastern and Coastal Kent
+E07000107,29UD,Dartford,E16000111,5P9,West Kent
+E07000108,29UE,Dover,E16000132,5QA,Eastern and Coastal Kent
+E07000109,29UG,Gravesham,E16000111,5P9,West Kent
+E07000110,29UH,Maidstone,E16000111,5P9,West Kent
+E07000111,29UK,Sevenoaks,E16000111,5P9,West Kent
+E07000112,29UL,Shepway,E16000132,5QA,Eastern and Coastal Kent
+E07000113,29UM,Swale,E16000132,5QA,Eastern and Coastal Kent
+E07000114,29UN,Thanet,E16000132,5QA,Eastern and Coastal Kent
+E07000115,29UP,Tonbridge and Malling,E16000111,5P9,West Kent
+E07000116,29UQ,Tunbridge Wells,E16000111,5P9,West Kent
+E07000117,30UD,Burnley,E16000089,5NH,East Lancashire Teaching
+E07000118,30UE,Chorley,E16000088,5NG,Central Lancashire
+E07000119,30UF,Fylde,E16000087,5NF,North Lancashire Teaching
+E07000120,30UG,Hyndburn,E16000089,5NH,East Lancashire Teaching
+E07000121,30UH,Lancaster,E16000087,5NF,North Lancashire Teaching
+E07000122,30UJ,Pendle,E16000089,5NH,East Lancashire Teaching
+E07000123,30UK,Preston,E16000088,5NG,Central Lancashire
+E07000124,30UL,Ribble Valley,E16000089,5NH,East Lancashire Teaching
+E07000125,30UM,Rossendale,E16000089,5NH,East Lancashire Teaching
+E07000126,30UN,South Ribble,E16000088,5NG,Central Lancashire
+E07000127,30UP,West Lancashire,E16000088,5NG,Central Lancashire
+E07000128,30UQ,Wyre,E16000087,5NF,North Lancashire Teaching
+E07000129,31UB,Blaby,E16000112,5PA,Leicestershire County and Rutland
+E07000130,31UC,Charnwood,E16000112,5PA,Leicestershire County and Rutland
+E07000131,31UD,Harborough,E16000112,5PA,Leicestershire County and Rutland
+E07000132,31UE,Hinckley and Bosworth,E16000112,5PA,Leicestershire County and Rutland
+E07000133,31UG,Melton,E16000112,5PA,Leicestershire County and Rutland
+E07000134,31UH,North West Leicestershire,E16000112,5PA,Leicestershire County and Rutland
+E07000135,31UJ,Oadby and Wigston,E16000112,5PA,Leicestershire County and Rutland
+E07000136,32UB,Boston,E16000082,5N9,Lincolnshire Teaching
+E07000137,32UC,East Lindsey,E16000082,5N9,Lincolnshire Teaching
+E07000138,32UD,Lincoln,E16000082,5N9,Lincolnshire Teaching
+E07000139,32UE,North Kesteven,E16000082,5N9,Lincolnshire Teaching
+E07000140,32UF,South Holland,E16000082,5N9,Lincolnshire Teaching
+E07000141,32UG,South Kesteven,E16000082,5N9,Lincolnshire Teaching
+E07000142,32UH,West Lindsey,E16000082,5N9,Lincolnshire Teaching
+E07000143,33UB,Breckland,E16000125,5PQ,Norfolk
+E07000144,33UC,Broadland,E16000125,5PQ,Norfolk
+E07000145,33UD,Great Yarmouth,E16000126,5PR,Great Yarmouth and Waveney
+E07000146,33UE,King's Lynn and West Norfolk,E16000125,5PQ,Norfolk
+E07000147,33UF,North Norfolk,E16000125,5PQ,Norfolk
+E07000148,33UG,Norwich,E16000125,5PQ,Norfolk
+E07000149,33UH,South Norfolk,E16000125,5PQ,Norfolk
+E07000150,34UB,Corby,E16000114,5PD,Northamptonshire Teaching
+E07000151,34UC,Daventry,E16000114,5PD,Northamptonshire Teaching
+E07000152,34UD,East Northamptonshire,E16000114,5PD,Northamptonshire Teaching
+E07000153,34UE,Kettering,E16000114,5PD,Northamptonshire Teaching
+E07000154,34UF,Northampton,E16000114,5PD,Northamptonshire Teaching
+E07000155,34UG,South Northamptonshire,E16000114,5PD,Northamptonshire Teaching
+E07000156,34UH,Wellingborough,E16000114,5PD,Northamptonshire Teaching
+E07000163,36UB,Craven,E16000099,5NV,North Yorkshire and York
+E07000164,36UC,Hambleton,E16000099,5NV,North Yorkshire and York
+E07000165,36UD,Harrogate,E16000099,5NV,North Yorkshire and York
+E07000166,36UE,Richmondshire,E16000099,5NV,North Yorkshire and York
+E07000167,36UF,Ryedale,E16000099,5NV,North Yorkshire and York
+E07000168,36UG,Scarborough,E16000099,5NV,North Yorkshire and York
+E07000169,36UH,Selby,E16000099,5NV,North Yorkshire and York
+E07000170,37UB,Ashfield,E16000081,5N8,Nottinghamshire County Teaching
+E07000171,37UC,Bassetlaw,E16000023,5ET,Bassetlaw
+E07000172,37UD,Broxtowe,E16000081,5N8,Nottinghamshire County Teaching
+E07000173,37UE,Gedling,E16000081,5N8,Nottinghamshire County Teaching
+E07000174,37UF,Mansfield,E16000081,5N8,Nottinghamshire County Teaching
+E07000175,37UG,Newark and Sherwood,E16000081,5N8,Nottinghamshire County Teaching
+E07000176,37UJ,Rushcliffe,E16000081,5N8,Nottinghamshire County Teaching
+E07000177,38UB,Cherwell,E16000135,5QE,Oxfordshire
+E07000178,38UC,Oxford,E16000135,5QE,Oxfordshire
+E07000179,38UD,South Oxfordshire,E16000134,5QD,Buckinghamshire
+E07000179,38UD,South Oxfordshire,E16000135,5QE,Oxfordshire
+E07000180,38UE,Vale of White Horse,E16000044,5K3,Swindon
+E07000180,38UE,Vale of White Horse,E16000135,5QE,Oxfordshire
+E07000181,38UF,West Oxfordshire,E16000135,5QE,Oxfordshire
+E07000187,40UB,Mendip,E16000141,5QL,Somerset
+E07000188,40UC,Sedgemoor,E16000141,5QL,Somerset
+E07000189,40UD,South Somerset,E16000141,5QL,Somerset
+E07000190,40UE,Taunton Deane,E16000141,5QL,Somerset
+E07000191,40UF,West Somerset,E16000141,5QL,Somerset
+E07000192,41UB,Cannock Chase,E16000120,5PK,South Staffordshire
+E07000193,41UC,East Staffordshire,E16000120,5PK,South Staffordshire
+E07000194,41UD,Lichfield,E16000120,5PK,South Staffordshire
+E07000195,41UE,Newcastle-under-Lyme,E16000118,5PH,North Staffordshire
+E07000196,41UF,South Staffordshire,E16000120,5PK,South Staffordshire
+E07000197,41UG,Stafford,E16000120,5PK,South Staffordshire
+E07000198,41UH,Staffordshire Moorlands,E16000118,5PH,North Staffordshire
+E07000198,41UH,Staffordshire Moorlands,E16000119,5PJ,Stoke on Trent
+E07000199,41UK,Tamworth,E16000120,5PK,South Staffordshire
+E07000200,42UB,Babergh,E16000127,5PT,Suffolk
+E07000201,42UC,Forest Heath,E16000127,5PT,Suffolk
+E07000202,42UD,Ipswich,E16000127,5PT,Suffolk
+E07000203,42UE,Mid Suffolk,E16000127,5PT,Suffolk
+E07000204,42UF,St Edmundsbury,E16000127,5PT,Suffolk
+E07000205,42UG,Suffolk Coastal,E16000127,5PT,Suffolk
+E07000206,42UH,Waveney,E16000126,5PR,Great Yarmouth and Waveney
+E07000207,43UB,Elmbridge,E16000107,5P5,Surrey
+E07000208,43UC,Epsom and Ewell,E16000107,5P5,Surrey
+E07000209,43UD,Guildford,E16000107,5P5,Surrey
+E07000210,43UE,Mole Valley,E16000107,5P5,Surrey
+E07000211,43UF,Reigate and Banstead,E16000107,5P5,Surrey
+E07000212,43UG,Runnymede,E16000107,5P5,Surrey
+E07000212,43UG,Runnymede,E16000137,5QG,Berkshire East
+E07000213,43UH,Spelthorne,E16000107,5P5,Surrey
+E07000214,43UJ,Surrey Heath,E16000107,5P5,Surrey
+E07000215,43UK,Tandridge,E16000107,5P5,Surrey
+E07000216,43UL,Waverley,E16000107,5P5,Surrey
+E07000217,43UM,Woking,E16000107,5P5,Surrey
+E07000218,44UB,North Warwickshire,E16000122,5PM,Warwickshire
+E07000219,44UC,Nuneaton and Bedworth,E16000122,5PM,Warwickshire
+E07000220,44UD,Rugby,E16000122,5PM,Warwickshire
+E07000221,44UE,Stratford-on-Avon,E16000122,5PM,Warwickshire
+E07000222,44UF,Warwick,E16000122,5PM,Warwickshire
+E07000223,45UB,Adur,E16000108,5P6,West Sussex
+E07000224,45UC,Arun,E16000108,5P6,West Sussex
+E07000225,45UD,Chichester,E16000108,5P6,West Sussex
+E07000226,45UE,Crawley,E16000108,5P6,West Sussex
+E07000227,45UF,Horsham,E16000108,5P6,West Sussex
+E07000228,45UG,Mid Sussex,E16000108,5P6,West Sussex
+E07000229,45UH,Worthing,E16000108,5P6,West Sussex
+E07000234,47UB,Bromsgrove,E16000121,5PL,Worcestershire
+E07000235,47UC,Malvern Hills,E16000121,5PL,Worcestershire
+E07000236,47UD,Redditch,E16000121,5PL,Worcestershire
+E07000237,47UE,Worcester,E16000121,5PL,Worcestershire
+E07000238,47UF,Wychavon,E16000121,5PL,Worcestershire
+E07000239,47UG,Wyre Forest,E16000121,5PL,Worcestershire

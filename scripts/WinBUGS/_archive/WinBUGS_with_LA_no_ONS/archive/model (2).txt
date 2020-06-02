@@ -1,0 +1,35 @@
+
+    model
+    {
+
+    # Priors
+    alpha ~ dunif(-2,1)
+    b.male ~ dunif(-2,1)
+    b.student ~ dunif(-2,1)
+
+    # Hyperpriors
+    tau.age ~ dunif(0,0.5)
+    tau.ethngrp ~ dunif(2,3)
+    tau.la ~ dunif(20,200)
+
+    # Likelihood
+    for(i in 1:n) {
+
+        cttestly[i] ~ dbin(p[i], N)
+        logit(p[i]) <- alpha + b.male*male[i] + b.student*student[i] + v[age[i]] + w[ethgrp[i]] + r[la_factor[i]]
+    }
+    # age
+    for(k in 1:K) {
+        v[k] ~ dnorm(0, tau.age)
+    }
+    # ethnic group
+    for(l in 1:L) {
+        w[l] ~ dnorm(0, tau.ethngrp)
+    }
+    # LA
+    for(s in 1:S) {
+        r[s] ~ dnorm(0, tau.la)
+    }
+
+    }
+    

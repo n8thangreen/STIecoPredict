@@ -1,0 +1,4 @@
+alpha	1	500
+b.age	501	1000
+b.sex	1001	1500
+deviance	1501	2000
